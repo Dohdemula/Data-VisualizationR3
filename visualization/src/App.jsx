@@ -1,0 +1,74 @@
+import { Component } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { RoleProvider, useRole, canAccess } from './context/RoleContext';
+import Layout from './components/layout/Layout';
+import Overview       from './pages/Overview';
+import Inventory      from './pages/Inventory';
+import Alerts         from './pages/Alerts';
+import SalesAnalytics from './pages/SalesAnalytics';
+import Forecasts      from './pages/Forecasts';
+import ModelInsights  from './pages/ModelInsights';
+import ReorderPO      from './pages/ReorderPO';
+import Reports        from './pages/Reports';
+import Settings       from './pages/Settings';
+import './styles/variables.css';
+import './styles/global.css';
+
+class ErrorBoundary extends Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '2rem', fontFamily: 'monospace', color: '#dc2626' }}>
+          <h2>Render Error</h2>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: '.85rem' }}>
+            {this.state.error.toString()}
+            {'\n\n'}
+            {this.state.error.stack}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const OPEN_ALERTS = 4;
+
+function ProtectedRoute({ minRole, element }) {
+  const { effectiveRole, loading } = useRole();
+  if (loading) return null;
+  return canAccess(effectiveRole, minRole) ? element : <Navigate to="/" replace />;
+}
+
+function AppRoutes() {
+  return (
+    <Layout alertCount={OPEN_ALERTS}>
+      <Routes>
+        <Route path="/"          element={<Overview />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/alerts"    element={<Alerts />} />
+        <Route path="/sales"     element={<ProtectedRoute minRole="analytical" element={<SalesAnalytics />} />} />
+        <Route path="/forecasts" element={<ProtectedRoute minRole="analytical" element={<Forecasts />} />} />
+        <Route path="/models"    element={<ProtectedRoute minRole="analytical" element={<ModelInsights />} />} />
+        <Route path="/reorder"   element={<ReorderPO />} />
+        <Route path="/reports"   element={<ProtectedRoute minRole="analytical" element={<Reports />} />} />
+        <Route path="/settings"  element={<ProtectedRoute minRole="management" element={<Settings />} />} />
+        <Route path="*"          element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <RoleProvider>
+          <AppRoutes />
+        </RoleProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
+}

@@ -1,0 +1,19 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout-main {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--topbar-height);
+  flex: 1;
+  min-width: 0;
+  transition: margin-left .2s ease;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .layout-main {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+}

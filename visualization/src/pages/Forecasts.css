@@ -1,0 +1,51 @@
+.fc-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;
+}
+
+.fc-controls { display: flex; align-items: center; gap: .5rem; }
+
+.fc-meta-row {
+  display: flex; gap: .625rem; margin-bottom: 1rem; flex-wrap: wrap;
+}
+
+.fc-badge {
+  display: flex; align-items: center; gap: .4rem;
+  background: var(--color-primary-light);
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm);
+  padding: .3rem .7rem;
+  font-size: .775rem;
+}
+
+.fc-badge-label { color: var(--color-text-muted); }
+.fc-badge strong { color: var(--color-primary); }
+
+.fc-range-label {
+  font-size: .75rem; font-weight: 400; color: var(--color-text-muted);
+}
+
+/* reuse topbar-select */
+.topbar-select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: .3rem .5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: .775rem;
+  cursor: pointer;
+}
+
+/* reuse gran-tabs from SalesAnalytics */
+.gran-tabs { display: flex; gap: .25rem; }
+
+.gran-tab {
+  padding: .3rem .7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: .775rem;
+  color: var(--color-text-muted);
+  transition: background .15s, color .15s;
+}
+
+.gran-tab:hover  { background: var(--color-bg); color: var(--color-text); }
+.gran-tab.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
