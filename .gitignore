@@ -8,6 +8,11 @@ Thumbs.db
 *.suo
 *.user
 
+# Environment — never commit; see .env.example in each subfolder
+.env
+.env.local
+.env.*.local
+
 # Temp files
 *.tmp
 *.log
