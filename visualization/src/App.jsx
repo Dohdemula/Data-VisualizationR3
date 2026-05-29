@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RoleProvider, useRole, canAccess } from './context/RoleContext';
+import { GlobalFilterProvider } from './context/GlobalFilterContext';
 import Layout from './components/layout/Layout';
 import Overview       from './pages/Overview';
 import Inventory      from './pages/Inventory';
@@ -66,7 +67,9 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <RoleProvider>
-          <AppRoutes />
+          <GlobalFilterProvider>
+            <AppRoutes />
+          </GlobalFilterProvider>
         </RoleProvider>
       </BrowserRouter>
     </ErrorBoundary>

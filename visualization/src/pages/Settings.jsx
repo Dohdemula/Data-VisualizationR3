@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import { getUsers, updateUser } from '../api/api';
+import { useGlobalFilter, DATE_RANGE_OPTIONS } from '../context/GlobalFilterContext';
 import { SkeletonRows, ErrorState } from '../components/ui/States';
+import { MdCheckCircle } from 'react-icons/md';
 import './Settings.css';
 
 const ROLES = ['operational', 'analytical', 'management'];
 
 export default function Settings() {
-  const [users, setUsers]     = useState([]);
+  const { prefs, setPrefs } = useGlobalFilter();
+  const [users,   setUsers]   = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [error,   setError]   = useState(null);
+  const [saved,   setSaved]   = useState(false);
 
   const load = () => {
     setLoading(true); setError(null);
@@ -22,11 +26,17 @@ export default function Settings() {
     await updateUser(userId, { role });
   };
 
+  const handlePrefChange = (key, value) => {
+    setPrefs({ [key]: value });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
     <div className="page">
       <div className="page-title">Settings &amp; Admin</div>
 
-      <div className="card" style={{ maxWidth: 640 }}>
+      <div className="card" style={{ maxWidth: 640, marginBottom: '.875rem' }}>
         <div className="chart-card-title">User Management</div>
         {loading ? <SkeletonRows count={4} /> :
          error   ? <ErrorState message={error} onRetry={load} /> :
@@ -52,19 +62,55 @@ export default function Settings() {
         </table>}
       </div>
 
-      <div className="card settings-prefs" style={{ maxWidth: 640, marginTop: '.875rem' }}>
-        <div className="chart-card-title">Preferences</div>
-        <div className="pref-row">
-          <label>Default period</label>
-          <select className="topbar-select"><option>Last 30 days</option><option>Last 7 days</option></select>
+      <div className="card settings-prefs" style={{ maxWidth: 640 }}>
+        <div className="settings-prefs-header">
+          <div className="chart-card-title" style={{ marginBottom: 0 }}>Preferences</div>
+          {saved && (
+            <span className="saved-indicator"><MdCheckCircle /> Saved</span>
+          )}
         </div>
+
         <div className="pref-row">
-          <label>Warning buffer above reorder point</label>
-          <input className="modal-input" type="number" defaultValue={30} style={{ width: 80 }} /> %
+          <label>Default date range</label>
+          <select
+            className="topbar-select"
+            value={prefs.defaultPeriod}
+            onChange={e => handlePrefChange('defaultPeriod', e.target.value)}
+          >
+            {DATE_RANGE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
         </div>
+
+        <div className="pref-row">
+          <label>
+            Warning buffer above reorder point
+            <span className="pref-hint">Stock within this % above reorder point shows as "Warning"</span>
+          </label>
+          <div className="pref-number-wrap">
+            <input
+              className="modal-input"
+              type="number"
+              min={0}
+              max={100}
+              value={prefs.warningBuffer}
+              onChange={e => handlePrefChange('warningBuffer', Math.max(0, Math.min(100, +e.target.value)))}
+              style={{ width: 70 }}
+            />
+            <span style={{ fontSize: '.8rem', color: 'var(--color-text-muted)' }}>%</span>
+          </div>
+        </div>
+
         <div className="pref-row">
           <label>Currency</label>
-          <select className="topbar-select"><option>KES</option><option>USD</option></select>
+          <select
+            className="topbar-select"
+            value={prefs.currency}
+            onChange={e => handlePrefChange('currency', e.target.value)}
+          >
+            <option value="KES">KES — Kenyan Shilling</option>
+            <option value="USD">USD — US Dollar</option>
+            <option value="EUR">EUR — Euro</option>
+          </select>
         </div>
       </div>
     </div>

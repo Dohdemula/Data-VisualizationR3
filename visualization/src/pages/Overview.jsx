@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useGlobalFilter, DATE_RANGE_OPTIONS } from '../context/GlobalFilterContext';
 import { getSummary } from '../api/api';
 import { SkeletonCard, ErrorState, EmptyState } from '../components/ui/States';
 import {
@@ -21,8 +22,8 @@ const HEALTH_COLORS = {
   critical: 'var(--color-critical)',
 };
 
-function fmt(value, format) {
-  if (format === 'currency') return `KES ${(value / 1000).toFixed(0)}K`;
+function fmt(value, format, currency = 'KES') {
+  if (format === 'currency') return `${currency} ${(value / 1000).toFixed(0)}K`;
   return value.toLocaleString();
 }
 
@@ -33,7 +34,7 @@ const ICON_BG = {
   'var(--color-ok)':       '#f0fdf4',
 };
 
-function KpiCard({ label, value, icon: Icon, color, format, prevValue }) {
+function KpiCard({ label, value, icon: Icon, color, format, currency, prevValue }) {
   const pct = prevValue ? (((value - prevValue) / prevValue) * 100).toFixed(1) : null;
   const up = pct > 0;
   return (
@@ -42,7 +43,7 @@ function KpiCard({ label, value, icon: Icon, color, format, prevValue }) {
         <Icon />
       </div>
       <div className="kpi-body">
-        <div className="kpi-value">{fmt(value, format)}</div>
+        <div className="kpi-value">{fmt(value, format, currency)}</div>
         <div className="kpi-label">{label}</div>
         {pct !== null && (
           <div className={`kpi-delta ${up ? 'up' : 'down'}`}>
@@ -55,6 +56,10 @@ function KpiCard({ label, value, icon: Icon, color, format, prevValue }) {
 }
 
 export default function Overview() {
+  const { dateRange, prefs } = useGlobalFilter();
+  const currency = prefs?.currency ?? 'KES';
+  const days = DATE_RANGE_OPTIONS.find(o => o.value === dateRange)?.days ?? 30;
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -70,6 +75,11 @@ export default function Overview() {
 
   useEffect(load, []);
 
+  const visibleTrend = useMemo(
+    () => (data?.salesTrend ?? []).slice(-days),
+    [data, days]
+  );
+
   if (loading) return (
     <div className="page">
       <div className="page-title">Overview</div>
@@ -81,7 +91,7 @@ export default function Overview() {
   if (error) return <div className="page"><ErrorState message={error} onRetry={load} /></div>;
   if (!data)  return <div className="page"><EmptyState title="No data available" /></div>;
 
-  const { kpis, stockHealth, salesTrend, topMovers } = data;
+  const { kpis, stockHealth, topMovers } = data;
 
   const healthPie = [
     { name: 'OK',       value: stockHealth.ok,       key: 'ok'       },
@@ -102,6 +112,7 @@ export default function Overview() {
             icon={icon}
             color={color}
             format={format}
+            currency={currency}
             prevValue={key === 'revenue' ? kpis.revenuePrevPeriod : undefined}
           />
         ))}
@@ -110,9 +121,9 @@ export default function Overview() {
       <div className="overview-charts">
         {/* Sales sparkline */}
         <div className="card chart-card">
-          <div className="chart-card-title">Sales Trend — last 30 days</div>
+          <div className="chart-card-title">Sales Trend — {DATE_RANGE_OPTIONS.find(o=>o.value===dateRange)?.label}</div>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={salesTrend} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+            <AreaChart data={visibleTrend} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d) => d.slice(5)} interval="preserveStartEnd" />
               <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
               <Tooltip formatter={(v) => [`KES ${v.toLocaleString()}`, 'Revenue']} />
