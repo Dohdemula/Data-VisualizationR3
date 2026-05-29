@@ -1,5 +1,4 @@
 import {
-  mockAuthMe,
   mockSummary,
   mockInventory,
   mockAlerts,
@@ -23,9 +22,40 @@ const live = async (url, options) => {
 };
 
 // --- Auth ---
-export async function getAuthMe() {
-  if (MOCK) { await delay(); return mockAuthMe; }
-  return live('/api/auth/me');
+export async function login({ credential, password }) {
+  if (MOCK) {
+    await delay(600);
+    const user = mockUsers.find(
+      (u) => (u.email === credential || u.username === credential) && u.password === password
+    );
+    if (!user) throw new Error('Invalid email/username or password.');
+    const { password: _pw, ...safeUser } = user;
+    return safeUser;
+  }
+  return live('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credential, password }),
+  });
+}
+
+export async function signup(userData) {
+  if (MOCK) {
+    await delay(800);
+    const exists = mockUsers.find(
+      (u) => u.email === userData.email || u.username === userData.username
+    );
+    if (exists) throw new Error('An account with this email or username already exists.');
+    const { password: _pw, confirmPassword: _cp, ...rest } = userData;
+    const newUser = { userId: `u${mockUsers.length + 1}`, ...rest };
+    mockUsers.push({ ...newUser, password: userData.password });
+    return newUser;
+  }
+  return live('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
 }
 
 // --- Overview ---

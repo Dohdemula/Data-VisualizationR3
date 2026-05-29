@@ -3,7 +3,7 @@
 
 export const mockAuthMe = {
   userId: 'u1',
-  name: 'Dennis Mbuno',
+  name: 'Julius Njenga',
   role: 'management', // 'operational' | 'analytical' | 'management'
 };
 
@@ -127,8 +127,24 @@ export const mockPurchaseOrders = [
 ];
 
 export const mockUsers = [
-  { userId: 'u1', name: 'Dennis Mbuno',   role: 'management',  email: 'dennis@store.co.ke' },
-  { userId: 'u2', name: 'Alice Wanjiru',  role: 'analytical',  email: 'alice@store.co.ke'  },
-  { userId: 'u3', name: 'John Kamau',     role: 'operational', email: 'john@store.co.ke'   },
-  { userId: 'u4', name: 'Grace Muthoni',  role: 'operational', email: 'grace@store.co.ke'  },
+  {
+    userId: 'u1', name: 'Julius Njenga', role: 'management',
+    email: 'Julius@store.co.ke', username: 'julius', password: 'demo123',
+    businessName: 'Julius Retail Ltd', businessReg: 'BN-2024-00123', phone: '0712345678',
+  },
+  {
+    userId: 'u2', name: 'Alice Wanjiru', role: 'analytical',
+    email: 'alice@store.co.ke', username: 'alice', password: 'demo123',
+    department: 'Demand Planning',
+  },
+  {
+    userId: 'u3', name: 'John Kamau', role: 'operational',
+    email: 'john@store.co.ke', username: 'john', password: 'demo123',
+    warehouse: 'Main',
+  },
+  {
+    userId: 'u4', name: 'Grace Muthoni', role: 'operational',
+    email: 'grace@store.co.ke', username: 'grace', password: 'demo123',
+    warehouse: 'Branch1',
+  },
 ];

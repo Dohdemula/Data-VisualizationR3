@@ -12,6 +12,8 @@ import ModelInsights  from './pages/ModelInsights';
 import ReorderPO      from './pages/ReorderPO';
 import Reports        from './pages/Reports';
 import Settings       from './pages/Settings';
+import Login          from './pages/Login';
+import Signup         from './pages/Signup';
 import './styles/variables.css';
 import './styles/global.css';
 
@@ -38,12 +40,11 @@ class ErrorBoundary extends Component {
 const OPEN_ALERTS = 4;
 
 function ProtectedRoute({ minRole, element }) {
-  const { effectiveRole, loading } = useRole();
-  if (loading) return null;
+  const { effectiveRole } = useRole();
   return canAccess(effectiveRole, minRole) ? element : <Navigate to="/" replace />;
 }
 
-function AppRoutes() {
+function DashboardRoutes() {
   return (
     <Layout alertCount={OPEN_ALERTS}>
       <Routes>
@@ -59,6 +60,18 @@ function AppRoutes() {
         <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
+  );
+}
+
+function AppRoutes() {
+  const { isAuthenticated } = useRole();
+
+  return (
+    <Routes>
+      <Route path="/login"  element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/signup" element={isAuthenticated ? <Navigate to="/" replace /> : <Signup />} />
+      <Route path="/*"      element={isAuthenticated ? <DashboardRoutes /> : <Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 

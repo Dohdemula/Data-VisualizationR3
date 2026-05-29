@@ -1,12 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MdSearch, MdNotifications, MdClose, MdInventory2, MdWarning } from 'react-icons/md';
+import {
+  MdSearch, MdNotifications, MdClose, MdInventory2, MdWarning,
+  MdPerson, MdLogout, MdExpandMore,
+} from 'react-icons/md';
 import { useRole } from '../../context/RoleContext';
 import { useGlobalFilter, DATE_RANGE_OPTIONS } from '../../context/GlobalFilterContext';
 import './TopBar.css';
 
+const ROLE_LABEL = {
+  operational: 'Operational',
+  analytical:  'Analytical',
+  management:  'Management',
+};
+
 export default function TopBar({ alertCount = 0 }) {
-  const { user, effectiveRole, devRole, setDevRole, ROLES } = useRole();
+  const { user, effectiveRole, devRole, setDevRole, ROLES, logout } = useRole();
   const {
     dateRange, setDateRange,
     warehouse, setWarehouse,
@@ -18,7 +27,9 @@ export default function TopBar({ alertCount = 0 }) {
 
   const [query, setQuery]             = useState('');
   const [showResults, setShowResults] = useState(false);
-  const searchRef = useRef(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const searchRef  = useRef(null);
+  const profileRef = useRef(null);
 
   const q = query.trim().toLowerCase();
   const matchProducts = q.length >= 2
@@ -36,6 +47,7 @@ export default function TopBar({ alertCount = 0 }) {
   useEffect(() => {
     const close = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) setShowResults(false);
+      if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfile(false);
     };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
@@ -46,6 +58,12 @@ export default function TopBar({ alertCount = 0 }) {
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '??';
+
+  const handleLogout = (e) => {
+    e.stopPropagation();
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header className="topbar">
@@ -140,12 +158,50 @@ export default function TopBar({ alertCount = 0 }) {
         {alertCount > 0 && <span className="topbar-bell-badge">{alertCount}</span>}
       </button>
 
-      <div className="topbar-user">
+      {/* User / profile dropdown */}
+      <div
+        className={`topbar-user ${showProfile ? 'active' : ''}`}
+        ref={profileRef}
+        onClick={() => setShowProfile(v => !v)}
+      >
         <div className="topbar-avatar">{initials}</div>
         <div className="topbar-user-info">
-          <div className="topbar-user-name">{user?.name || 'Loading…'}</div>
-          <div className="topbar-user-role">{effectiveRole}</div>
+          <div className="topbar-user-name">{user?.name || 'User'}</div>
+          <div className="topbar-user-role">{ROLE_LABEL[effectiveRole] ?? effectiveRole}</div>
         </div>
+        <MdExpandMore className={`topbar-chevron ${showProfile ? 'open' : ''}`} />
+
+        {showProfile && (
+          <div className="profile-dropdown" onClick={e => e.stopPropagation()}>
+            <div className="profile-dropdown-header">
+              <div className="profile-dropdown-avatar">{initials}</div>
+              <div className="profile-dropdown-meta">
+                <div className="profile-dropdown-name">{user?.name}</div>
+                {user?.email && <div className="profile-dropdown-email">{user.email}</div>}
+                <span className={`profile-dropdown-badge role-${effectiveRole}`}>
+                  {ROLE_LABEL[effectiveRole]}
+                </span>
+              </div>
+            </div>
+
+            {(user?.businessName || user?.department || user?.warehouse) && (
+              <div className="profile-dropdown-detail">
+                {user.businessName && <span>{user.businessName}</span>}
+                {user.department   && <span>Dept: {user.department}</span>}
+                {user.warehouse    && <span>Warehouse: {user.warehouse}</span>}
+              </div>
+            )}
+
+            <div className="profile-dropdown-divider" />
+
+            <button className="profile-dropdown-item" onClick={() => { navigate('/settings'); setShowProfile(false); }}>
+              <MdPerson /> My Profile
+            </button>
+            <button className="profile-dropdown-item sign-out" onClick={handleLogout}>
+              <MdLogout /> Sign Out
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

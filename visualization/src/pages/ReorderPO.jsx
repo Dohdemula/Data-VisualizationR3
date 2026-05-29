@@ -53,7 +53,7 @@ export default function ReorderPO() {
                   <td>{s.supplierName}</td>
                   <td>
                     <button className="btn-create-po" onClick={() => handleCreate(s)}>
-                      <MdAddShoppingCart /> Create PO
+                      <MdAddShoppingCart /> Create Purchase Order
                     </button>
                   </td>
                 </tr>
