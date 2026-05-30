@@ -10,7 +10,7 @@ const DEMO_ROLES = [
   { role: 'operational', label: 'Operational', color: '#065f46', desc: 'Inventory, alerts, stock tasks' },
 ];
 
-export default function Login() {
+export default function Login({ isPublicInstance = false, initialized = true }) {
   const { login, loginAsDemo } = useRole();
   const navigate = useNavigate();
 
@@ -121,6 +121,15 @@ export default function Login() {
           <p className="auth-switch">
             <Link to="/forgot-password">Forgot your password?</Link>
           </p>
+
+          {(!initialized || isPublicInstance) && (
+            <p className="auth-switch" style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--color-border)' }}>
+              {!initialized
+                ? <><Link to="/setup">Set up your dashboard</Link> — first-time setup</>
+                : <>Want this for your business? <Link to="/request-access">Request access</Link></>
+              }
+            </p>
+          )}
 
           {/* Demo section */}
           <div className="auth-demo">

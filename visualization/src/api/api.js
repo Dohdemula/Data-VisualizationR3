@@ -262,3 +262,38 @@ export async function deactivateUser(id) {
   if (isMock()) { await delay(200); return { ok: true }; }
   return live(`/api/users/${id}/deactivate`, { method: 'PUT' });
 }
+
+// ── Setup & onboarding ────────────────────────────────────────────────────────
+
+export async function checkSetupStatus() {
+  if (isMock()) return { initialized: true, isPublicInstance: false };
+  return live('/api/setup/status');
+}
+
+export async function initializeSystem(data) {
+  if (isMock()) { await delay(1000); return { ok: true }; }
+  return live('/api/setup', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function submitAccessRequest(data) {
+  if (isMock()) { await delay(800); return { ok: true }; }
+  return live('/api/requests', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function getApprovalDetails(id, key) {
+  if (isMock()) {
+    await delay(400);
+    return {
+      id, business_name: 'Demo Corp Ltd', name: 'Demo User',
+      email: 'demo@corp.co.ke', phone: '0712 000 000',
+      message: 'Looking forward to using InvenSight for our retail operations.',
+      status: 'pending', created_at: Math.floor(Date.now() / 1000) - 3600,
+    };
+  }
+  return live(`/api/requests/${id}/details?key=${encodeURIComponent(key)}`);
+}
+
+export async function approveRequest(id, key) {
+  if (isMock()) { await delay(600); return { ok: true }; }
+  return live(`/api/requests/${id}/approve?key=${encodeURIComponent(key)}`, { method: 'POST' });
+}

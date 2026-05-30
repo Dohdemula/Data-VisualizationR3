@@ -55,6 +55,31 @@ function getDb() {
       ip         TEXT,
       created_at INTEGER NOT NULL DEFAULT (unixepoch())
     );
+
+    CREATE TABLE IF NOT EXISTS access_requests (
+      id                TEXT PRIMARY KEY,
+      business_name     TEXT NOT NULL,
+      name              TEXT NOT NULL,
+      email             TEXT NOT NULL,
+      phone             TEXT NOT NULL,
+      message           TEXT,
+      status            TEXT NOT NULL DEFAULT 'pending'
+                        CHECK(status IN ('pending','approved','declined')),
+      approval_key_hash TEXT UNIQUE,
+      setup_token_hash  TEXT UNIQUE,
+      created_at        INTEGER NOT NULL DEFAULT (unixepoch()),
+      reviewed_at       INTEGER
+    );
+
+    CREATE TABLE IF NOT EXISTS consumed_setup_tokens (
+      token_hash  TEXT PRIMARY KEY,
+      consumed_at INTEGER NOT NULL DEFAULT (unixepoch())
+    );
+
+    CREATE TABLE IF NOT EXISTS system_config (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
   `);
 
   return db;

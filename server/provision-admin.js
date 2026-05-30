@@ -68,6 +68,9 @@ async function main() {
     VALUES (?, ?, ?, ?, 'management', 'active', ?)
   `).run(uuid(), name, email, hash, bizName);
 
+  db.prepare(`INSERT OR REPLACE INTO system_config (key, value) VALUES ('initialized', 'true')`).run();
+  db.prepare(`INSERT OR REPLACE INTO system_config (key, value) VALUES ('business_name', ?)`).run(bizName);
+
   console.log(`\nDone. Admin account created for ${email}.`);
   console.log('Start the server and sign in at the dashboard.\n');
   rl.close();
