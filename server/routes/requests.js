@@ -47,12 +47,17 @@ router.post('/', onlyPublic, async (req, res) => {
 
   try {
     await sendRequestReceived({ to: email, name, businessName });
+  } catch (err) {
+    console.error('Email error (request confirmation):', err.message);
+  }
+
+  try {
     await sendApprovalNotification({
       to: process.env.DEVELOPER_EMAIL,
       businessName, name, email, phone, message, approvalUrl,
     });
   } catch (err) {
-    console.error('Email error on request submit:', err.message);
+    console.error('Email error (approval notification):', err.message);
   }
 
   res.json({ ok: true });
@@ -113,14 +118,23 @@ router.post('/:id/approve', onlyPublic, async (req, res) => {
     WHERE id = ?
   `).run(hash(setupToken), row.id);
 
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('\n🔑  Setup token (dev only):\n' + setupToken + '\n');
+  }
+
   try {
     await sendSetupToken({ to: row.email, name: row.name, businessName: row.business_name, token: setupToken });
+  } catch (err) {
+    console.error('Email error (setup token to requester):', err.message);
+  }
+
+  try {
     await sendTokenIssuedConfirmation({
       to: process.env.DEVELOPER_EMAIL,
       name: row.name, email: row.email, businessName: row.business_name,
     });
   } catch (err) {
-    console.error('Email error on approval:', err.message);
+    console.error('Email error (token issued confirmation):', err.message);
   }
 
   res.json({ ok: true, message: `Setup token issued to ${row.email}.` });
