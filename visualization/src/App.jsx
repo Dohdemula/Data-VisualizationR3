@@ -97,7 +97,7 @@ function AppRoutes() {
         element={sys.isPublicInstance ? <RequestAccess /> : <Navigate to="/login" replace />}
       />
       <Route path="/setup"
-        element={sys.initialized
+        element={(!sys.isPublicInstance && sys.initialized)
           ? <Navigate to="/login" replace />
           : <SetupWizard onComplete={() => setSys(s => ({ ...s, initialized: true }))} />}
       />

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getInventory, getAlerts } from '../api/api';
+import { useRole } from './RoleContext';
 
 const GlobalFilterContext = createContext(null);
 
@@ -19,19 +20,22 @@ function loadPrefs() {
 }
 
 export function GlobalFilterProvider({ children }) {
+  const { isAuthenticated } = useRole();
+
   const [prefs, setPrefsState] = useState(loadPrefs);
   const [dateRange, setDateRange] = useState(() => loadPrefs().defaultPeriod || '30d');
   const [warehouse, setWarehouse] = useState('all');
   const [category, setCategory]   = useState('all');
 
-  // Loaded once — used for search results and deriving filter option lists
+  // Loaded after login — used for search results and deriving filter option lists
   const [allProducts, setAllProducts] = useState([]);
   const [allAlerts,   setAllAlerts]   = useState([]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     getInventory().then(setAllProducts).catch(() => {});
     getAlerts('all').then(setAllAlerts).catch(() => {});
-  }, []);
+  }, [isAuthenticated]);
 
   const warehouses = ['all', ...new Set(allProducts.map(p => p.warehouse))];
   const categories = ['all', ...new Set(allProducts.map(p => p.category))];
