@@ -1,27 +1,35 @@
 import { useState } from 'react';
-import { MdInventory2, MdVisibility, MdVisibilityOff, MdCheckCircle } from 'react-icons/md';
+import { Link, useNavigate } from 'react-router-dom';
+import { MdInventory2, MdCheckCircle } from 'react-icons/md';
+import { useRole } from '../context/RoleContext';
 import { initializeSystem } from '../api/api';
 import './Login.css';
 import './SetupWizard.css';
 
 const TIMEZONES = [
-  { value: 'Africa/Nairobi',   label: 'East Africa Time (EAT) — Nairobi' },
-  { value: 'Africa/Lagos',     label: 'West Africa Time (WAT) — Lagos'    },
-  { value: 'Africa/Cairo',     label: 'Eastern European Time — Cairo'      },
-  { value: 'Africa/Johannesburg', label: 'South Africa Standard Time'      },
-  { value: 'UTC',              label: 'UTC'                                 },
+  { value: 'Africa/Nairobi',      label: 'East Africa Time (EAT) — Nairobi'  },
+  { value: 'Africa/Lagos',        label: 'West Africa Time (WAT) — Lagos'     },
+  { value: 'Africa/Cairo',        label: 'Eastern European Time — Cairo'       },
+  { value: 'Africa/Johannesburg', label: 'South Africa Standard Time'          },
+  { value: 'UTC',                 label: 'UTC'                                  },
 ];
 
 const CURRENCIES = [
-  { value: 'KES', label: 'KES — Kenyan Shilling'  },
-  { value: 'UGX', label: 'UGX — Ugandan Shilling' },
+  { value: 'KES', label: 'KES — Kenyan Shilling'   },
+  { value: 'UGX', label: 'UGX — Ugandan Shilling'  },
   { value: 'TZS', label: 'TZS — Tanzanian Shilling' },
-  { value: 'NGN', label: 'NGN — Nigerian Naira'    },
-  { value: 'GHS', label: 'GHS — Ghanaian Cedi'     },
-  { value: 'USD', label: 'USD — US Dollar'          },
+  { value: 'NGN', label: 'NGN — Nigerian Naira'     },
+  { value: 'GHS', label: 'GHS — Ghanaian Cedi'      },
+  { value: 'USD', label: 'USD — US Dollar'           },
 ];
 
-const STEPS = ['Business', 'Your Account', 'Activation'];
+const DEMO_ROLES = [
+  { role: 'management',  label: 'Management',  color: '#6d28d9', desc: 'Full access — KPIs, forecasts, admin' },
+  { role: 'analytical',  label: 'Analytical',  color: '#1d4ed8', desc: 'Sales analytics, forecasts, reports'  },
+  { role: 'operational', label: 'Operational', color: '#065f46', desc: 'Inventory, alerts, stock tasks'        },
+];
+
+const STEPS = ['Activation', 'Business'];
 
 function StepIndicator({ current }) {
   return (
@@ -38,32 +46,24 @@ function StepIndicator({ current }) {
 }
 
 export default function SetupWizard({ onComplete }) {
+  const { loginAsDemo } = useRole();
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
-    businessName: '', timezone: 'Africa/Nairobi', currency: 'KES',
-    name: '', email: '', password: '', confirmPassword: '',
     setupToken: '',
+    businessName: '', timezone: 'Africa/Nairobi', currency: 'KES',
   });
-  const [showPw,   setShowPw]   = useState(false);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState(null);
-  const [done,     setDone]     = useState(false);
+  const [loading,     setLoading]     = useState(false);
+  const [demoLoading, setDemoLoading] = useState(null);
+  const [error,       setError]       = useState(null);
+  const [done,        setDone]        = useState(false);
 
   const set = (k) => (e) => { setForm(f => ({ ...f, [k]: e.target.value })); setError(null); };
 
   const validateStep = () => {
-    if (step === 0) {
-      if (!form.businessName.trim()) return 'Business name is required.';
-    }
-    if (step === 1) {
-      if (!form.name.trim())          return 'Your name is required.';
-      if (!form.email.trim())         return 'Email is required.';
-      if (form.password.length < 8)   return 'Password must be at least 8 characters.';
-      if (form.password !== form.confirmPassword) return 'Passwords do not match.';
-    }
-    if (step === 2) {
-      if (!form.setupToken.trim()) return 'Please paste your setup token.';
-    }
+    if (step === 0 && !form.setupToken.trim()) return 'Please paste your setup token.';
+    if (step === 1 && !form.businessName.trim()) return 'Business name is required.';
     return null;
   };
 
@@ -83,19 +83,29 @@ export default function SetupWizard({ onComplete }) {
     setError(null);
     try {
       await initializeSystem({
+        setupToken:   form.setupToken.trim(),
         businessName: form.businessName.trim(),
         timezone:     form.timezone,
         currency:     form.currency,
-        name:         form.name.trim(),
-        email:        form.email.trim().toLowerCase(),
-        password:     form.password,
-        setupToken:   form.setupToken.trim(),
       });
       setDone(true);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDemo = async (role) => {
+    setError(null);
+    setDemoLoading(role);
+    try {
+      await loginAsDemo(role);
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDemoLoading(null);
     }
   };
 
@@ -106,7 +116,7 @@ export default function SetupWizard({ onComplete }) {
           <div className="sw-done">
             <MdCheckCircle className="sw-done-icon" />
             <h2>You're all set!</h2>
-            <p>Your InvenSight dashboard is ready. Sign in with the email and password you just created.</p>
+            <p>Your InvenSight dashboard is ready. Sign in with the email and password you set when you submitted your request.</p>
             <button className="auth-btn-primary sw-done-btn" onClick={onComplete}>
               Go to Sign In
             </button>
@@ -131,8 +141,60 @@ export default function SetupWizard({ onComplete }) {
 
         {error && <div className="auth-error sw-error">{error}</div>}
 
-        {/* ── Step 0: Business ── */}
+        {/* ── Step 0: Activation ── */}
         {step === 0 && (
+          <div className="sw-step-body">
+            <h3 className="sw-step-title">Activation token</h3>
+            <p className="sw-step-hint">
+              Paste the setup token from your approval email. It's a long string — paste it exactly as received.
+            </p>
+
+            <div className="auth-field">
+              <label htmlFor="setupToken">Setup Token</label>
+              <textarea
+                id="setupToken"
+                className="sw-token-input"
+                placeholder="Paste your token here…"
+                value={form.setupToken}
+                onChange={set('setupToken')}
+                rows={4}
+                autoFocus
+                spellCheck={false}
+              />
+            </div>
+
+            <p className="sw-no-token">
+              Don't have a token yet?{' '}
+              <Link to="/request-access">Request access</Link>
+              {' '}— we'll review and send one within 24 hours.
+            </p>
+
+            <div className="auth-demo sw-demo">
+              <div className="auth-demo-label">Or try a live demo first</div>
+              <p className="auth-demo-hint">Explore the full dashboard with sample data — no account needed.</p>
+              <div className="auth-demo-cards">
+                {DEMO_ROLES.map(({ role, label, color, desc }) => (
+                  <button
+                    key={role}
+                    className="auth-demo-card"
+                    style={{ '--demo-color': color }}
+                    onClick={() => handleDemo(role)}
+                    disabled={!!demoLoading || loading}
+                    type="button"
+                  >
+                    <span className="auth-demo-card-label">
+                      {demoLoading === role ? 'Loading…' : label}
+                    </span>
+                    <span className="auth-demo-card-desc">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 1: Business ── */}
+        {step === 1 && (
           <div className="sw-step-body">
             <h3 className="sw-step-title">Business details</h3>
 
@@ -156,76 +218,10 @@ export default function SetupWizard({ onComplete }) {
                 </select>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* ── Step 1: Account ── */}
-        {step === 1 && (
-          <div className="sw-step-body">
-            <h3 className="sw-step-title">Your account</h3>
-            <p className="sw-step-hint">This will be the Management account. You can invite staff later from Settings.</p>
-
-            <div className="sw-row">
-              <div className="auth-field">
-                <label htmlFor="name">Full Name</label>
-                <input id="name" type="text" placeholder="Your name"
-                  value={form.name} onChange={set('name')} autoFocus />
-              </div>
-              <div className="auth-field">
-                <label htmlFor="email">Email</label>
-                <input id="email" type="email" placeholder="you@business.co.ke"
-                  value={form.email} onChange={set('email')} />
-              </div>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="password">Password <span className="sw-hint-inline">(min 8 characters)</span></label>
-              <div className="auth-input-wrap">
-                <input id="password" type={showPw ? 'text' : 'password'}
-                  placeholder="At least 8 characters"
-                  value={form.password} onChange={set('password')}
-                  autoComplete="new-password" />
-                <button type="button" className="auth-pw-toggle" onClick={() => setShowPw(v => !v)} tabIndex={-1}>
-                  {showPw ? <MdVisibilityOff /> : <MdVisibility />}
-                </button>
-              </div>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input id="confirmPassword" type="password" placeholder="Repeat password"
-                value={form.confirmPassword} onChange={set('confirmPassword')}
-                autoComplete="new-password" />
-            </div>
-          </div>
-        )}
-
-        {/* ── Step 2: Token ── */}
-        {step === 2 && (
-          <div className="sw-step-body">
-            <h3 className="sw-step-title">Activation token</h3>
-            <p className="sw-step-hint">
-              Paste the setup token from your approval email. It's a long string — paste it exactly as received.
-            </p>
-
-            <div className="auth-field">
-              <label htmlFor="setupToken">Setup Token</label>
-              <textarea
-                id="setupToken"
-                className="sw-token-input"
-                placeholder="Paste your token here…"
-                value={form.setupToken}
-                onChange={set('setupToken')}
-                rows={5}
-                autoFocus
-                spellCheck={false}
-              />
-            </div>
 
             <div className="sw-review">
               <div className="sw-review-title">Review</div>
               <div className="sw-review-row"><span>Business</span><strong>{form.businessName}</strong></div>
-              <div className="sw-review-row"><span>Account</span><strong>{form.name} ({form.email})</strong></div>
               <div className="sw-review-row"><span>Currency</span><strong>{form.currency}</strong></div>
               <div className="sw-review-row"><span>Timezone</span><strong>{form.timezone}</strong></div>
             </div>
@@ -240,8 +236,8 @@ export default function SetupWizard({ onComplete }) {
             </button>
           )}
           <div style={{ flex: 1 }} />
-          {step < 2 ? (
-            <button className="auth-btn-primary sw-next-btn" onClick={next}>
+          {step < 1 ? (
+            <button className="auth-btn-primary sw-next-btn" onClick={next} disabled={!!demoLoading}>
               Continue
             </button>
           ) : (

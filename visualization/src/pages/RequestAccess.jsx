@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MdInventory2, MdCheckCircle, MdArrowBack } from 'react-icons/md';
+import { MdInventory2, MdCheckCircle, MdArrowBack, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { submitAccessRequest } from '../api/api';
 import './Login.css';
 import './RequestAccess.css';
 
 export default function RequestAccess() {
   const [form, setForm] = useState({
-    businessName: '', name: '', email: '', phone: '', message: '',
+    businessName: '', name: '', email: '', phone: '', password: '', confirmPassword: '', message: '',
   });
+  const [showPw,  setShowPw]  = useState(false);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
   const [done,    setDone]    = useState(false);
@@ -17,9 +18,17 @@ export default function RequestAccess() {
 
   const submit = async (e) => {
     e.preventDefault();
-    const { businessName, name, email, phone } = form;
-    if (!businessName.trim() || !name.trim() || !email.trim() || !phone.trim()) {
+    const { businessName, name, email, phone, password, confirmPassword } = form;
+    if (!businessName.trim() || !name.trim() || !email.trim() || !phone.trim() || !password) {
       setError('Please fill in all required fields.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
       return;
     }
     setError(null);
@@ -30,6 +39,7 @@ export default function RequestAccess() {
         name:         name.trim(),
         email:        email.trim().toLowerCase(),
         phone:        phone.trim(),
+        password,
         message:      form.message.trim() || undefined,
       });
       setDone(true);
@@ -106,6 +116,30 @@ export default function RequestAccess() {
                 </div>
 
                 <div className="auth-field">
+                  <label htmlFor="password">Password <span className="ra-req">*</span> <span style={{ fontWeight: 400, color: 'var(--color-text-muted)', fontSize: '.72rem' }}>(min 8 characters)</span></label>
+                  <div className="auth-input-wrap">
+                    <input
+                      id="password" type={showPw ? 'text' : 'password'}
+                      placeholder="At least 8 characters"
+                      value={form.password} onChange={set('password')}
+                      autoComplete="new-password"
+                    />
+                    <button type="button" className="auth-pw-toggle" onClick={() => setShowPw(v => !v)} tabIndex={-1}>
+                      {showPw ? <MdVisibilityOff /> : <MdVisibility />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="auth-field">
+                  <label htmlFor="confirmPassword">Confirm Password <span className="ra-req">*</span></label>
+                  <input
+                    id="confirmPassword" type="password" placeholder="Repeat password"
+                    value={form.confirmPassword} onChange={set('confirmPassword')}
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                <div className="auth-field">
                   <label htmlFor="message">
                     Tell us about your business
                     <span style={{ fontWeight: 400, color: 'var(--color-text-muted)', fontSize: '.72rem', marginLeft: '.4rem' }}>
@@ -132,7 +166,7 @@ export default function RequestAccess() {
               <h3>Request received!</h3>
               <p>
                 We'll review your request and email you at <strong>{form.email}</strong> within 24 hours.
-                If approved, you'll receive a setup token with instructions.
+                If approved, you'll receive a setup token to activate your account — then you can sign in with the credentials you just set.
               </p>
               <Link to="/login" className="auth-btn-primary" style={{ display: 'block', textAlign: 'center', marginTop: '1.5rem' }}>
                 Back to Sign In

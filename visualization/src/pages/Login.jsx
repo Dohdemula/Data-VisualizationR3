@@ -68,6 +68,7 @@ export default function Login({ isPublicInstance = false, initialized = true }) 
           <li>Sales analytics &amp; trend insights</li>
           <li>Role-based access for your whole team</li>
         </ul>
+
       </div>
 
       <div className="auth-card-wrap">
@@ -122,12 +123,9 @@ export default function Login({ isPublicInstance = false, initialized = true }) 
             <Link to="/forgot-password">Forgot your password?</Link>
           </p>
 
-          {(!initialized || isPublicInstance) && (
+          {(isPublicInstance || !initialized) && (
             <p className="auth-switch" style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--color-border)' }}>
-              {!initialized
-                ? <><Link to="/setup">Set up your dashboard</Link> — first-time setup</>
-                : <>Want this for your business? <Link to="/request-access">Request access</Link></>
-              }
+              New here? <Link to="/setup">Get started</Link>
             </p>
           )}
 

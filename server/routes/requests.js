@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt    = require('jsonwebtoken');
 const { v4: uuid } = require('uuid');
@@ -21,22 +22,26 @@ function hash(t) {
 
 // POST /api/requests — submit an access request
 router.post('/', onlyPublic, async (req, res) => {
-  const { businessName, name, email, phone, message } = req.body;
+  const { businessName, name, email, phone, message, password } = req.body;
 
-  if (!businessName || !name || !email || !phone) {
+  if (!businessName || !name || !email || !phone || !password) {
     return res.status(400).json({
-      error: 'Business name, your name, email, and phone number are required.',
+      error: 'Business name, your name, email, phone number, and password are required.',
     });
   }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
 
-  const db  = getDb();
-  const id  = uuid();
-  const key = crypto.randomBytes(32).toString('hex');
+  const db           = getDb();
+  const id           = uuid();
+  const key          = crypto.randomBytes(32).toString('hex');
+  const passwordHash = await bcrypt.hash(password, 12);
 
   db.prepare(`
-    INSERT INTO access_requests (id, business_name, name, email, phone, message, approval_key_hash)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(id, businessName, name, email, phone, message || null, hash(key));
+    INSERT INTO access_requests (id, business_name, name, email, phone, message, approval_key_hash, password_hash)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(id, businessName, name, email, phone, message || null, hash(key), passwordHash);
 
   const approvalUrl = `${process.env.CLIENT_URL}/approve-request?id=${id}&key=${key}`;
 
@@ -83,12 +88,20 @@ router.post('/:id/approve', onlyPublic, async (req, res) => {
   if (!row)                            return res.status(404).json({ error: 'Request not found or already reviewed.' });
   if (row.approval_key_hash !== hash(key)) return res.status(403).json({ error: 'Invalid approval key.' });
 
+  if (!row.password_hash) {
+    return res.status(400).json({
+      error: 'This request has no stored credentials. The requester must submit a new request.',
+    });
+  }
+
   const setupToken = jwt.sign(
     {
       purpose:      'invensight-setup',
       email:        row.email,
+      name:         row.name,
       businessName: row.business_name,
       requestId:    row.id,
+      passwordHash: row.password_hash,
     },
     process.env.ADMIN_SECRET,
     { expiresIn: '7d' }

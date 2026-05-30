@@ -28,13 +28,10 @@ router.post('/', async (req, res) => {
     return res.status(409).json({ error: 'System is already initialized.' });
   }
 
-  const { businessName, timezone, currency, name, email, password, setupToken } = req.body;
+  const { businessName, timezone, currency, setupToken } = req.body;
 
-  if (!businessName || !name || !email || !password || !setupToken) {
-    return res.status(400).json({ error: 'All fields are required.' });
-  }
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  if (!businessName || !setupToken) {
+    return res.status(400).json({ error: 'Business name and setup token are required.' });
   }
 
   // Validate JWT setup token
@@ -49,6 +46,13 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Invalid setup token.' });
   }
 
+  // Credentials travel inside the token — reject tokens from the old flow
+  if (!payload.passwordHash || !payload.email || !payload.name) {
+    return res.status(400).json({
+      error: 'This token was issued under an older flow. The requester must submit a new request.',
+    });
+  }
+
   // Single-use enforcement
   const tokenHash = hash(setupToken);
   const consumed  = db.prepare(
@@ -59,13 +63,12 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'This setup token has already been used.' });
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  const userId       = uuid();
+  const userId = uuid();
 
   db.prepare(`
     INSERT INTO users (id, name, email, password_hash, role, status, business_name)
     VALUES (?, ?, ?, ?, 'management', 'active', ?)
-  `).run(userId, name, email, passwordHash, businessName);
+  `).run(userId, payload.name, payload.email, payload.passwordHash, businessName);
 
   db.prepare(`INSERT OR REPLACE INTO system_config (key, value) VALUES ('initialized', 'true')`).run();
   db.prepare(`INSERT OR REPLACE INTO system_config (key, value) VALUES ('business_name', ?)`).run(businessName);

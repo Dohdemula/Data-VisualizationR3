@@ -82,6 +82,9 @@ function getDb() {
     );
   `);
 
+  // Migrations — add columns to existing tables if they don't exist yet
+  try { db.exec(`ALTER TABLE access_requests ADD COLUMN password_hash TEXT`); } catch (_) {}
+
   return db;
 }
 
