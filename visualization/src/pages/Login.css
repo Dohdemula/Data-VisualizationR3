@@ -215,26 +215,41 @@
   margin-bottom: .6rem;
 }
 
-.auth-demo-pills {
+.auth-demo-cards {
   display: flex;
+  flex-direction: column;
   gap: .5rem;
-  flex-wrap: wrap;
 }
 
-.auth-demo-pill {
-  padding: .3rem .75rem;
-  border-radius: 999px;
-  border: 1.5px solid var(--pill-color, #2563eb);
-  color: var(--pill-color, #2563eb);
-  background: transparent;
-  font-size: .75rem;
-  font-weight: 600;
+.auth-demo-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .6rem .875rem;
+  border: 1.5px solid color-mix(in srgb, var(--demo-color) 35%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--demo-color) 6%, transparent);
   cursor: pointer;
-  transition: background .15s, color .15s;
+  text-align: left;
+  transition: background .15s, border-color .15s;
 }
-.auth-demo-pill:hover {
-  background: var(--pill-color, #2563eb);
-  color: #fff;
+.auth-demo-card:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--demo-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--demo-color) 60%, transparent);
+}
+.auth-demo-card:disabled { opacity: .6; cursor: not-allowed; }
+
+.auth-demo-card-label {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--demo-color);
+  white-space: nowrap;
+}
+.auth-demo-card-desc {
+  font-size: .72rem;
+  color: var(--color-text-muted);
+  text-align: right;
 }
 
 .auth-demo-hint {

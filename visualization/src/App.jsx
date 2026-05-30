@@ -2,18 +2,20 @@ import { Component } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RoleProvider, useRole, canAccess } from './context/RoleContext';
 import { GlobalFilterProvider } from './context/GlobalFilterContext';
-import Layout from './components/layout/Layout';
-import Overview       from './pages/Overview';
-import Inventory      from './pages/Inventory';
-import Alerts         from './pages/Alerts';
+import Layout        from './components/layout/Layout';
+import Overview      from './pages/Overview';
+import Inventory     from './pages/Inventory';
+import Alerts        from './pages/Alerts';
 import SalesAnalytics from './pages/SalesAnalytics';
-import Forecasts      from './pages/Forecasts';
-import ModelInsights  from './pages/ModelInsights';
-import ReorderPO      from './pages/ReorderPO';
-import Reports        from './pages/Reports';
-import Settings       from './pages/Settings';
-import Login          from './pages/Login';
-import Signup         from './pages/Signup';
+import Forecasts     from './pages/Forecasts';
+import ModelInsights from './pages/ModelInsights';
+import ReorderPO     from './pages/ReorderPO';
+import Reports       from './pages/Reports';
+import Settings      from './pages/Settings';
+import Login         from './pages/Login';
+import AcceptInvite  from './pages/AcceptInvite';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import './styles/variables.css';
 import './styles/global.css';
 
@@ -26,9 +28,7 @@ class ErrorBoundary extends Component {
         <div style={{ padding: '2rem', fontFamily: 'monospace', color: '#dc2626' }}>
           <h2>Render Error</h2>
           <pre style={{ whiteSpace: 'pre-wrap', fontSize: '.85rem' }}>
-            {this.state.error.toString()}
-            {'\n\n'}
-            {this.state.error.stack}
+            {this.state.error.toString()}{'\n\n'}{this.state.error.stack}
           </pre>
         </div>
       );
@@ -64,13 +64,23 @@ function DashboardRoutes() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated } = useRole();
+  const { isAuthenticated, loading } = useRole();
+
+  // Hold render while session is being restored from localStorage/server
+  if (loading) return null;
 
   return (
     <Routes>
-      <Route path="/login"  element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
-      <Route path="/signup" element={isAuthenticated ? <Navigate to="/" replace /> : <Signup />} />
-      <Route path="/*"      element={isAuthenticated ? <DashboardRoutes /> : <Navigate to="/login" replace />} />
+      {/* Public auth routes — redirect to dashboard if already signed in */}
+      <Route path="/login"          element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/" replace /> : <ForgotPassword />} />
+
+      {/* Token-gated routes — always public (user may not be signed in) */}
+      <Route path="/accept-invite"  element={<AcceptInvite />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* All dashboard routes — require auth */}
+      <Route path="/*" element={isAuthenticated ? <DashboardRoutes /> : <Navigate to="/login" replace />} />
     </Routes>
   );
 }

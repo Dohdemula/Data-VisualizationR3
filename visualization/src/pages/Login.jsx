@@ -4,20 +4,21 @@ import { MdInventory2, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { useRole } from '../context/RoleContext';
 import './Login.css';
 
-const DEMO_ACCOUNTS = [
-  { label: 'Management',  credential: 'julius', password: 'demo123', color: '#6d28d9' },
-  { label: 'Analytical',  credential: 'alice',  password: 'demo123', color: '#1d4ed8' },
-  { label: 'Operational', credential: 'john',   password: 'demo123', color: '#065f46' },
+const DEMO_ROLES = [
+  { role: 'management',  label: 'Management',  color: '#6d28d9', desc: 'Full access — KPIs, forecasts, admin' },
+  { role: 'analytical',  label: 'Analytical',  color: '#1d4ed8', desc: 'Sales analytics, forecasts, reports' },
+  { role: 'operational', label: 'Operational', color: '#065f46', desc: 'Inventory, alerts, stock tasks' },
 ];
 
 export default function Login() {
-  const { login } = useRole();
+  const { login, loginAsDemo } = useRole();
   const navigate = useNavigate();
 
   const [credential, setCredential] = useState('');
   const [password, setPassword]     = useState('');
   const [showPw, setShowPw]         = useState(false);
   const [loading, setLoading]       = useState(false);
+  const [demoLoading, setDemoLoading] = useState(null); // role string while loading
   const [error, setError]           = useState(null);
 
   const submit = async (e) => {
@@ -38,10 +39,17 @@ export default function Login() {
     }
   };
 
-  const fillDemo = (account) => {
-    setCredential(account.credential);
-    setPassword(account.password);
+  const handleDemo = async (role) => {
     setError(null);
+    setDemoLoading(role);
+    try {
+      await loginAsDemo(role);
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDemoLoading(null);
+    }
   };
 
   return (
@@ -50,7 +58,7 @@ export default function Login() {
         <div className="auth-brand-logo">
           <MdInventory2 />
         </div>
-        <h1 className="auth-brand-name">InventIQ</h1>
+        <h1 className="auth-brand-name">InvenSight</h1>
         <p className="auth-brand-tagline">
           Intelligent Inventory Forecasting &amp; Sales Analytics for Kenyan SMEs
         </p>
@@ -75,7 +83,7 @@ export default function Login() {
               <input
                 id="credential"
                 type="text"
-                placeholder="e.g. julius or julius@store.co.ke"
+                placeholder="you@company.co.ke or username"
                 value={credential}
                 onChange={e => setCredential(e.target.value)}
                 autoComplete="username"
@@ -105,31 +113,38 @@ export default function Login() {
               </div>
             </div>
 
-            <button className="auth-btn-primary" type="submit" disabled={loading}>
+            <button className="auth-btn-primary" type="submit" disabled={loading || !!demoLoading}>
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
 
           <p className="auth-switch">
-            Don't have an account? <Link to="/signup">Create one</Link>
+            <Link to="/forgot-password">Forgot your password?</Link>
           </p>
 
+          {/* Demo section */}
           <div className="auth-demo">
-            <div className="auth-demo-label">Demo accounts</div>
-            <div className="auth-demo-pills">
-              {DEMO_ACCOUNTS.map(a => (
+            <div className="auth-demo-label">Try a live demo</div>
+            <p className="auth-demo-hint" style={{ marginBottom: '.75rem', marginTop: 0 }}>
+              Explore the full dashboard with sample data — no account needed.
+            </p>
+            <div className="auth-demo-cards">
+              {DEMO_ROLES.map(({ role, label, color, desc }) => (
                 <button
-                  key={a.label}
-                  className="auth-demo-pill"
-                  style={{ '--pill-color': a.color }}
-                  onClick={() => fillDemo(a)}
+                  key={role}
+                  className="auth-demo-card"
+                  style={{ '--demo-color': color }}
+                  onClick={() => handleDemo(role)}
+                  disabled={!!demoLoading || loading}
                   type="button"
                 >
-                  {a.label}
+                  <span className="auth-demo-card-label">
+                    {demoLoading === role ? 'Loading…' : label}
+                  </span>
+                  <span className="auth-demo-card-desc">{desc}</span>
                 </button>
               ))}
             </div>
-            <p className="auth-demo-hint">Click a role to pre-fill credentials, then Sign In.</p>
           </div>
         </div>
       </div>

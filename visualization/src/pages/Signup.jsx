@@ -96,7 +96,7 @@ export default function Signup() {
     <div className="auth-page">
       <div className="auth-brand">
         <div className="auth-brand-logo"><MdInventory2 /></div>
-        <h1 className="auth-brand-name">InventIQ</h1>
+        <h1 className="auth-brand-name">InvenSight</h1>
         <p className="auth-brand-tagline">
           Create your account. Your role determines what you can see and do in the system.
         </p>
