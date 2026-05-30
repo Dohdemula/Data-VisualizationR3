@@ -17,3 +17,6 @@ Thumbs.db
 *.tmp
 *.log
 sow_text.txt
+
+# Claude Code — project diary, not for the repo
+CLAUDE.md
