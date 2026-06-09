@@ -179,11 +179,13 @@ Demo accounts (accessible from the login page and the setup wizard) always work 
 > **Integration status (all 9 screens — no 404s):**
 > - **Forecasts & Model Insights** — live via David's forecasting module (port 8000)
 > - **Sales Analytics** — live via Brian's analytics API (port 8001, proxied through Express)
-> - **Overview** — live: real SKUs, stock health, revenue (shows 0 with the 2019 dataset as date filters find no recent transactions — correct when connected to live data)
-> - **Inventory** — live: real stock levels per product from Brian's inventory table
-> - **Alerts** — live endpoint, empty until alerts are generated via Brian's `/api/v1/alerts/generate`
+> - **Overview** — live: KES 322,966 revenue (90d), 89-day sales trend, real stock health
+> - **Inventory** — live: real stock levels per product
+> - **Alerts** — live endpoint, empty until stock movements trigger alerts
 > - **Reorder / POs** — live endpoints, empty until stock falls below reorder points
 > - **Reports** — renders from context data; no dedicated API call
+>
+> **Dataset:** `Data set/supermarket_sales.csv` — dates shifted to 2026-03-14 → 2026-06-10 for demo purposes. Same copy used by David's forecasting module.
 
 ---
 
