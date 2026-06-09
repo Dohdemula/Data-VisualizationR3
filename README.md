@@ -176,14 +176,14 @@ Remove or leave blank `VITE_API_BASE_URL` in `visualization/.env`. The frontend 
 
 Demo accounts (accessible from the login page and the setup wizard) always work in mock mode.
 
-> **Integration status:**
+> **Integration status (all 9 screens — no 404s):**
 > - **Forecasts & Model Insights** — live via David's forecasting module (port 8000)
 > - **Sales Analytics** — live via Brian's analytics API (port 8001, proxied through Express)
-> - **Overview** — partially live: revenue and sales trend are real; stock health KPIs show 0 pending Brian's inventory endpoint
-> - **Inventory, Alerts, Reorder / POs** — show empty state; pending Brian implementing these endpoints in his API
+> - **Overview** — live: real SKUs, stock health, revenue (shows 0 with the 2019 dataset as date filters find no recent transactions — correct when connected to live data)
+> - **Inventory** — live: real stock levels per product from Brian's inventory table
+> - **Alerts** — live endpoint, empty until alerts are generated via Brian's `/api/v1/alerts/generate`
+> - **Reorder / POs** — live endpoints, empty until stock falls below reorder points
 > - **Reports** — renders from context data; no dedicated API call
->
-> All screens return valid responses (no 404s). Screens with missing backend data display empty states gracefully.
 
 ---
 
