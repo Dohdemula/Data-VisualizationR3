@@ -74,42 +74,51 @@ export const mockSales = (from, to, granularity = 'daily') => ({
   })),
 });
 
-const makeHistory = (n) =>
-  Array.from({ length: n }, (_, i) => ({
-    date: new Date(Date.now() - (n - i) * 86400000).toISOString().slice(0, 10),
-    actual: 80 + Math.round(Math.random() * 60),
-  }));
+export const PRODUCT_LINES = [
+  'Food and beverages',
+  'Health and beauty',
+  'Electronic accessories',
+  'Fashion accessories',
+  'Sports and travel',
+  'Home and lifestyle',
+];
 
-const makeForecast = (n) =>
-  Array.from({ length: n }, (_, i) => {
-    const predicted = 90 + Math.round(Math.random() * 50);
+const MOCK_MODELS = ['Naive', 'Moving Average', 'ARIMA', 'SARIMA', 'XGBoost'];
+
+export const mockForecast = (productLine) => {
+  const today = new Date();
+  const forecast = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i + 1);
+    const predicted = 400 + Math.round(Math.random() * 300);
     return {
-      date: new Date(Date.now() + i * 86400000).toISOString().slice(0, 10),
+      date: d.toISOString().slice(0, 10),
       predicted,
-      lower: predicted - 15 - Math.round(Math.random() * 10),
-      upper: predicted + 15 + Math.round(Math.random() * 10),
+      lower:  Math.round(predicted * 0.85),
+      upper:  Math.round(predicted * 1.15),
     };
   });
+  return {
+    productLine,
+    model:   MOCK_MODELS[Math.floor(Math.random() * MOCK_MODELS.length)],
+    metrics: { mae: +(320 + Math.random() * 80).toFixed(2), rmse: +(400 + Math.random() * 80).toFixed(2), smape: +(28 + Math.random() * 10).toFixed(2) },
+    history: [],
+    forecast,
+  };
+};
 
-export const mockForecast = (productId, horizon = 30) => ({
-  productId,
-  model: 'Prophet',
-  metrics: { mae: 8.2, rmse: 11.4, mape: 9.7 },
-  history: makeHistory(60),
-  forecast: makeForecast(horizon),
-});
-
-export const mockModelsComparison = mockInventory.map((p) => ({
-  productId: p.productId,
-  name: p.name,
-  selectedModel: ['Prophet', 'ARIMA', 'XGBoost', 'Random Forest', 'Naïve'][Math.floor(Math.random() * 5)],
+export const mockModelsComparison = PRODUCT_LINES.map((line) => ({
+  productId:     line,
+  name:          line,
+  selectedModel: MOCK_MODELS[Math.floor(Math.random() * MOCK_MODELS.length)],
   candidates: [
-    { model: 'Naïve',         mae: 15 + Math.random() * 5, rmse: 18 + Math.random() * 5, mape: 14 + Math.random() * 5 },
-    { model: 'ARIMA',         mae: 11 + Math.random() * 4, rmse: 14 + Math.random() * 4, mape: 10 + Math.random() * 4 },
-    { model: 'Prophet',       mae: 8  + Math.random() * 3, rmse: 11 + Math.random() * 3, mape: 9  + Math.random() * 3 },
-    { model: 'Random Forest', mae: 9  + Math.random() * 3, rmse: 12 + Math.random() * 3, mape: 10 + Math.random() * 3 },
-    { model: 'XGBoost',       mae: 9  + Math.random() * 3, rmse: 12 + Math.random() * 3, mape: 9  + Math.random() * 3 },
-  ].map((c) => ({ ...c, mae: +c.mae.toFixed(2), rmse: +c.rmse.toFixed(2), mape: +c.mape.toFixed(2) })),
+    { model: 'Naive',          score: +(4.5 + Math.random() * 0.3).toFixed(2) },
+    { model: 'Moving Average', score: +(4.2 + Math.random() * 0.3).toFixed(2) },
+    { model: 'ARIMA',          score: +(4.0 + Math.random() * 0.3).toFixed(2) },
+    { model: 'SARIMA',         score: +(4.1 + Math.random() * 0.3).toFixed(2) },
+    { model: 'XGBoost',        score: +(3.8 + Math.random() * 0.3).toFixed(2) },
+  ],
+  metrics: { mae: +(320 + Math.random() * 80).toFixed(2), rmse: +(400 + Math.random() * 80).toFixed(2), smape: +(28 + Math.random() * 10).toFixed(2) },
 }));
 
 export const mockReorderSuggestions = [

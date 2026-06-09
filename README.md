@@ -133,29 +133,43 @@ VITE_API_BASE_URL=http://localhost:4000
 
 ## Running in development
 
-Open two terminals:
+Open three terminals:
 
-**Terminal 1 - server:**
+**Terminal 1 — auth server:**
 ```bash
 cd server
 node --experimental-sqlite index.js
 ```
 
-**Terminal 2 - frontend:**
+**Terminal 2 — forecasting server (David's module):**
+```bash
+cd ../forecasting_module      # cloned separately
+python manage.py runserver 0.0.0.0:8000
+```
+
+**Terminal 3 — frontend:**
 ```bash
 cd visualization
 npm run dev
 ```
 
-Frontend runs at `http://localhost:3000`, server at `http://localhost:4000`.
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Auth / data server | http://localhost:4000 |
+| Forecasting server | http://127.0.0.1:8000 |
+
+The forecasting server is optional — if it isn't running, the Forecasts and Model Insights screens fall back to mock data automatically (when `VITE_API_BASE_URL` is unset) or show an error (when pointed at the real server).
 
 ---
 
 ## Mock mode (no server needed)
 
-Remove or leave blank `VITE_API_BASE_URL` in `visualization/.env`. The frontend runs entirely on mock data - all nine dashboard screens work with no server running. Useful for frontend-only development.
+Remove or leave blank `VITE_API_BASE_URL` in `visualization/.env`. The frontend runs entirely on mock data — all nine dashboard screens work with no server running. Useful for frontend-only development.
 
 Demo accounts (accessible from the login page and the setup wizard) always work in mock mode.
+
+> **Integration status:** Forecasts and Model Insights screens are wired to David's forecasting module (port 8000). Overview, Inventory, Alerts, Sales Analytics, Reorder, and Reports are pending Brian's REST API — they run on realistic mock data until his endpoints are ready.
 
 ---
 
@@ -234,5 +248,7 @@ Invite links expire after 72 hours. If a link expires before the user accepts, r
 | Database | SQLite via Node built-in `node:sqlite` |
 | Auth | bcrypt, jsonwebtoken, httpOnly refresh token cookies |
 | Email | Nodemailer (Resend SMTP or Ethereal in dev) |
+| Forecasting | Django 6 + Django REST Framework (David's module, port 8000) |
+| ML models | Naive, Moving Average, ARIMA, SARIMA, XGBoost — best selected per product line |
 
 ---

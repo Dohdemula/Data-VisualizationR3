@@ -8,12 +8,14 @@ import {
   mockReorderSuggestions,
   mockPurchaseOrders,
   mockUsers,
+  PRODUCT_LINES,
 } from './mockData';
 
 // When VITE_API_BASE_URL is set the app talks to the real server.
 // Leave it unset (or empty) in .env to keep using mock data locally.
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-const MOCK     = !BASE_URL;
+const BASE_URL    = import.meta.env.VITE_API_BASE_URL || '';
+const FORECAST_URL = import.meta.env.VITE_FORECAST_URL || 'http://127.0.0.1:8000';
+const MOCK        = !BASE_URL;
 
 // Demo mode: forces mock data even when the real server is configured.
 // Toggled by loginAsDemo / logout in RoleContext.
@@ -199,16 +201,70 @@ export async function getSales(from, to, granularity = 'daily') {
 
 // ── Forecasts ─────────────────────────────────────────────────────────────────
 
-export async function getForecast(productId, horizon = 30) {
-  if (isMock()) { await delay(); return mockForecast(productId, horizon); }
-  return live(`/api/forecasts/${productId}?horizon=${horizon}`);
+export { PRODUCT_LINES };
+
+export async function getForecast(productLine) {
+  if (isMock()) { await delay(); return mockForecast(productLine); }
+
+  const res = await fetch(`${FORECAST_URL}/api/forecast/${encodeURIComponent(productLine)}/`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `${res.status} ${res.statusText}`);
+  }
+  const raw = await res.json();
+
+  const today = new Date();
+  const forecast = raw.predictions.map((val, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i + 1);
+    const predicted = +val.toFixed(2);
+    return {
+      date:      d.toISOString().slice(0, 10),
+      predicted,
+      lower:     +(predicted * 0.85).toFixed(2),
+      upper:     +(predicted * 1.15).toFixed(2),
+    };
+  });
+
+  return {
+    productLine: raw.product_line,
+    model:       raw.best_model,
+    metrics: {
+      mae:   +raw.metrics.MAE.toFixed(2),
+      rmse:  +raw.metrics.RMSE.toFixed(2),
+      smape: +raw.metrics.SMAPE.toFixed(2),
+    },
+    history: [],
+    forecast,
+  };
 }
 
 // ── Model Insights ────────────────────────────────────────────────────────────
 
 export async function getModelsComparison() {
   if (isMock()) { await delay(); return mockModelsComparison; }
-  return live('/api/models/comparison');
+
+  const results = await Promise.all(
+    PRODUCT_LINES.map(line =>
+      fetch(`${FORECAST_URL}/api/forecast/${encodeURIComponent(line)}/`)
+        .then(r => r.json())
+    )
+  );
+
+  return results.map(raw => ({
+    productId:     raw.product_line,
+    name:          raw.product_line,
+    selectedModel: raw.best_model,
+    candidates:    Object.entries(raw.all_models).map(([model, score]) => ({
+      model,
+      score: +score.toFixed(2),
+    })),
+    metrics: {
+      mae:   +raw.metrics.MAE.toFixed(2),
+      rmse:  +raw.metrics.RMSE.toFixed(2),
+      smape: +raw.metrics.SMAPE.toFixed(2),
+    },
+  }));
 }
 
 // ── Reorder & POs ─────────────────────────────────────────────────────────────

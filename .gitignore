@@ -13,9 +13,19 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# SQLite database files — never commit live data
+server/data/*.db
+server/data/*.db-shm
+server/data/*.db-wal
+
+# Dataset — large CSV, not source code
+Data set/
+
+# Server runtime logs
+server/*.log
+
 # Temp files
 *.tmp
-*.log
 sow_text.txt
 
 # Claude Code - project diary, not for the repo
