@@ -1,3 +1,6 @@
+# Dependencies
+node_modules/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -26,6 +29,8 @@ server/*.log
 
 # Temp files
 *.tmp
+*.cookie
+cookies.txt
 sow_text.txt
 
 # Claude Code - project diary, not for the repo

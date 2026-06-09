@@ -194,9 +194,30 @@ export async function resolveAlert(alertId) {
 
 // ── Sales Analytics ───────────────────────────────────────────────────────────
 
-export async function getSales(from, to, granularity = 'daily') {
+export async function getSales(from, to, granularity = 'monthly') {
   if (isMock()) { await delay(); return mockSales(from, to, granularity); }
-  return live(`/api/sales?from=${from}&to=${to}&granularity=${granularity}`);
+
+  const [monthlyRaw, productRaw] = await Promise.all([
+    live('/api/analytics/sales-by-month'),
+    live('/api/analytics/sales-by-product'),
+  ]);
+
+  const series = (monthlyRaw.monthly_trend || []).map(row => ({
+    date:    `${row.year}-${String(row.month_number).padStart(2, '0')}-01`,
+    revenue: Number(row.total_revenue),
+    units:   Number(row.total_units),
+  }));
+
+  const byProduct = (productRaw.sales_by_product || []).map(row => ({
+    productId: row.product_line,
+    name:      row.product_line,
+    category:  row.product_line,
+    revenue:   Number(row.total_revenue),
+    units:     Number(row.total_units),
+    growthPct: 0,
+  }));
+
+  return { series, byProduct };
 }
 
 // ── Forecasts ─────────────────────────────────────────────────────────────────

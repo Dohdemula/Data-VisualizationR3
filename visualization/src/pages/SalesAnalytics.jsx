@@ -7,32 +7,22 @@ import {
 } from 'recharts';
 import './SalesAnalytics.css';
 
-const GRAN = ['daily', 'weekly', 'monthly'];
-
 export default function SalesAnalytics() {
-  const [data, setData]         = useState(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
-  const [granularity, setGran]  = useState('daily');
+  const [data, setData]       = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
 
-  const load = (g = granularity) => {
+  const load = () => {
     setLoading(true); setError(null);
-    getSales(null, null, g).then(setData).catch(e => setError(e.message)).finally(() => setLoading(false));
+    getSales().then(setData).catch(e => setError(e.message)).finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(granularity); }, [granularity]); // eslint-disable-line
+  useEffect(load, []);
 
   return (
     <div className="page">
       <div className="sa-header">
         <div className="page-title" style={{ marginBottom: 0 }}>Sales Analytics</div>
-        <div className="gran-tabs">
-          {GRAN.map(g => (
-            <button key={g} className={`gran-tab${granularity === g ? ' active' : ''}`} onClick={() => setGran(g)}>
-              {g.charAt(0).toUpperCase() + g.slice(1)}
-            </button>
-          ))}
-        </div>
       </div>
 
       {loading ? <SkeletonCard rows={6} /> :
@@ -44,7 +34,9 @@ export default function SalesAnalytics() {
           <ResponsiveContainer width="100%" height={260}>
             <ComposedChart data={data.series} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} interval="preserveStartEnd" />
+              <XAxis dataKey="date" tick={{ fontSize: 10 }}
+                tickFormatter={d => new Date(d).toLocaleDateString('en', { month: 'short', year: '2-digit' })}
+                interval="preserveStartEnd" />
               <YAxis yAxisId="rev" tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
               <YAxis yAxisId="units" orientation="right" tick={{ fontSize: 10 }} />
               <Tooltip />

@@ -20,6 +20,7 @@ app.use('/api/auth',     require('./routes/auth'));
 app.use('/api/users',    require('./routes/users'));
 app.use('/api/requests', require('./routes/requests'));
 app.use('/api/setup',    require('./routes/setup'));
+app.use('/api',          require('./routes/brian'));
 
 app.get('/api/health', (_, res) => res.json({ ok: true, ts: Date.now() }));
 

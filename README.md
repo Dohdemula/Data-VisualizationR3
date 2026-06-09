@@ -133,33 +133,40 @@ VITE_API_BASE_URL=http://localhost:4000
 
 ## Running in development
 
-Open three terminals:
+Open four terminals:
 
-**Terminal 1 -auth server:**
+**Terminal 1 — auth server:**
 ```bash
 cd server
 node --experimental-sqlite index.js
 ```
 
-**Terminal 2 -forecasting server (David's module):**
+**Terminal 2 — forecasting server (David's module):**
 ```bash
-cd ../forecasting_module      # cloned separately
+cd ../forecasting_module
 python manage.py runserver 0.0.0.0:8000
 ```
 
-**Terminal 3 -frontend:**
+**Terminal 3 — analytics API (Brian's module):**
+```bash
+cd ../inventory-forecasting-system/api
+python -m uvicorn main:app --host 0.0.0.0 --port 8001
+```
+
+**Terminal 4 — frontend:**
 ```bash
 cd visualization
 npm run dev
 ```
 
-| Service | URL |
-|---|---|
-| Frontend | http://localhost:3000 |
-| Auth / data server | http://localhost:4000 |
-| Forecasting server | http://127.0.0.1:8000 |
+| Service | URL | Required for |
+|---|---|---|
+| Frontend | http://localhost:3000 | Everything |
+| Auth server | http://localhost:4000 | Login, users, onboarding |
+| Forecasting API | http://127.0.0.1:8000 | Forecasts, Model Insights |
+| Analytics API | http://localhost:8001 | Sales Analytics, Supply Risk |
 
-The forecasting server is optional -if it isn't running, the Forecasts and Model Insights screens fall back to mock data automatically (when `VITE_API_BASE_URL` is unset) or show an error (when pointed at the real server).
+Brian's and David's servers are optional — affected screens fall back to mock data when `VITE_API_BASE_URL` is unset, or show a "service unavailable" error in real mode.
 
 ---
 
@@ -169,7 +176,14 @@ Remove or leave blank `VITE_API_BASE_URL` in `visualization/.env`. The frontend 
 
 Demo accounts (accessible from the login page and the setup wizard) always work in mock mode.
 
-> **Integration status:** Forecasts and Model Insights screens are wired to David's forecasting module (port 8000). Overview, Inventory, Alerts, Sales Analytics, Reorder, and Reports are pending Brian's REST API -they run on realistic mock data until his endpoints are ready.
+> **Integration status:**
+> - **Forecasts & Model Insights** — live via David's forecasting module (port 8000)
+> - **Sales Analytics** — live via Brian's analytics API (port 8001, proxied through Express)
+> - **Overview** — partially live: revenue and sales trend are real; stock health KPIs show 0 pending Brian's inventory endpoint
+> - **Inventory, Alerts, Reorder / POs** — show empty state; pending Brian implementing these endpoints in his API
+> - **Reports** — renders from context data; no dedicated API call
+>
+> All screens return valid responses (no 404s). Screens with missing backend data display empty states gracefully.
 
 ---
 
