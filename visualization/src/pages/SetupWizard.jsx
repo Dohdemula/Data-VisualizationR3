@@ -7,24 +7,24 @@ import './Login.css';
 import './SetupWizard.css';
 
 const TIMEZONES = [
-  { value: 'Africa/Nairobi',      label: 'East Africa Time (EAT) — Nairobi'  },
-  { value: 'Africa/Lagos',        label: 'West Africa Time (WAT) — Lagos'     },
-  { value: 'Africa/Cairo',        label: 'Eastern European Time — Cairo'       },
+  { value: 'Africa/Nairobi',      label: 'East Africa Time (EAT) - Nairobi'  },
+  { value: 'Africa/Lagos',        label: 'West Africa Time (WAT) - Lagos'     },
+  { value: 'Africa/Cairo',        label: 'Eastern European Time - Cairo'       },
   { value: 'Africa/Johannesburg', label: 'South Africa Standard Time'          },
   { value: 'UTC',                 label: 'UTC'                                  },
 ];
 
 const CURRENCIES = [
-  { value: 'KES', label: 'KES — Kenyan Shilling'   },
-  { value: 'UGX', label: 'UGX — Ugandan Shilling'  },
-  { value: 'TZS', label: 'TZS — Tanzanian Shilling' },
-  { value: 'NGN', label: 'NGN — Nigerian Naira'     },
-  { value: 'GHS', label: 'GHS — Ghanaian Cedi'      },
-  { value: 'USD', label: 'USD — US Dollar'           },
+  { value: 'KES', label: 'KES - Kenyan Shilling'   },
+  { value: 'UGX', label: 'UGX - Ugandan Shilling'  },
+  { value: 'TZS', label: 'TZS - Tanzanian Shilling' },
+  { value: 'NGN', label: 'NGN - Nigerian Naira'     },
+  { value: 'GHS', label: 'GHS - Ghanaian Cedi'      },
+  { value: 'USD', label: 'USD - US Dollar'           },
 ];
 
 const DEMO_ROLES = [
-  { role: 'management',  label: 'Management',  color: '#6d28d9', desc: 'Full access — KPIs, forecasts, admin' },
+  { role: 'management',  label: 'Management',  color: '#6d28d9', desc: 'Full access - KPIs, forecasts, admin' },
   { role: 'analytical',  label: 'Analytical',  color: '#1d4ed8', desc: 'Sales analytics, forecasts, reports'  },
   { role: 'operational', label: 'Operational', color: '#065f46', desc: 'Inventory, alerts, stock tasks'        },
 ];
@@ -146,7 +146,7 @@ export default function SetupWizard({ onComplete }) {
           <div className="sw-step-body">
             <h3 className="sw-step-title">Activation token</h3>
             <p className="sw-step-hint">
-              Paste the setup token from your approval email. It's a long string — paste it exactly as received.
+              Paste the setup token from your approval email. It's a long string - paste it exactly as received.
             </p>
 
             <div className="auth-field">
@@ -165,13 +165,13 @@ export default function SetupWizard({ onComplete }) {
 
             <p className="sw-no-token">
               Don't have a token yet?{' '}
-              <Link to="/request-access">Request access</Link>
-              {' '}— we'll review and send one within 24 hours.
+              <Link to="/request-access">Request a setup token</Link>
+              {' '} we'll review and send one within 24 hours.
             </p>
 
             <div className="auth-demo sw-demo">
               <div className="auth-demo-label">Or try a live demo first</div>
-              <p className="auth-demo-hint">Explore the full dashboard with sample data — no account needed.</p>
+              <p className="auth-demo-hint">Explore the full dashboard with sample data - no account needed.</p>
               <div className="auth-demo-cards">
                 {DEMO_ROLES.map(({ role, label, color, desc }) => (
                   <button

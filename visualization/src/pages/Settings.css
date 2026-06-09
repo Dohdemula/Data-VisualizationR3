@@ -149,7 +149,7 @@
 
 .row-muted td { opacity: .5; }
 
-/* reuse modal-input from Inventory.css — declare here too */
+/* reuse modal-input from Inventory.css - declare here too */
 .modal-input {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);

@@ -10,7 +10,7 @@ Every shape below is copied directly from the frontend adapter layer (`visualiza
 
 ---
 
-## Simiyu — Database & ETL
+## Simiyu - Database & ETL
 
 ### `GET /api/summary?period=30d`
 
@@ -43,9 +43,9 @@ Every shape below is copied directly from the frontend adapter layer (`visualiza
 }
 ```
 
-- `salesTrend` — one entry per day covering the requested period
-- `changePct` — positive = growing, negative = declining vs previous equivalent period
-- `revenue` / `revenuePrevPeriod` — KES, raw numbers (no formatting)
+- `salesTrend` - one entry per day covering the requested period
+- `changePct` - positive = growing, negative = declining vs previous equivalent period
+- `revenue` / `revenuePrevPeriod` - KES, raw numbers (no formatting)
 
 ---
 
@@ -68,9 +68,9 @@ Returns all products. No query params.
 ]
 ```
 
-- `stock` — current on-hand quantity
-- `reorderPoint` — the threshold at which an alert fires
-- `warehouse` — name string matching your warehouses table
+- `stock` - current on-hand quantity
+- `reorderPoint` - the threshold at which an alert fires
+- `warehouse` - name string matching your warehouses table
 
 ---
 
@@ -109,9 +109,9 @@ Manual stock adjustment by a user.
 ]
 ```
 
-- `type` — `"low-stock"` | `"anomaly"` | `"expiry"` (extend as needed)
-- `severity` — `"warning"` | `"critical"`
-- `resolved` — boolean
+- `type` - `"low-stock"` | `"anomaly"` | `"expiry"` (extend as needed)
+- `severity` - `"warning"` | `"critical"`
+- `resolved` - boolean
 
 ---
 
@@ -128,8 +128,8 @@ No request body required.
 
 ### `GET /api/sales?from=2026-04-01&to=2026-05-01&granularity=daily`
 
-- `from` / `to` — ISO date strings (`YYYY-MM-DD`)
-- `granularity` — `"daily"` | `"weekly"` | `"monthly"`
+- `from` / `to` - ISO date strings (`YYYY-MM-DD`)
+- `granularity` - `"daily"` | `"weekly"` | `"monthly"`
 
 ```json
 {
@@ -150,9 +150,9 @@ No request body required.
 }
 ```
 
-- `series` — time-series for the revenue chart, bucketed by granularity
-- `byProduct` — one row per product for the breakdown table
-- `growthPct` — vs equivalent previous period, signed float
+- `series` - time-series for the revenue chart, bucketed by granularity
+- `byProduct` - one row per product for the breakdown table
+- `growthPct` - vs equivalent previous period, signed float
 
 ---
 
@@ -193,8 +193,8 @@ All purchase orders, any status.
 ]
 ```
 
-- `status` — `"pending"` | `"confirmed"` | `"shipped"` | `"received"`
-- `expectedDate` — ISO date string
+- `status` - `"pending"` | `"confirmed"` | `"shipped"` | `"received"`
+- `expectedDate` - ISO date string
 
 ---
 
@@ -226,12 +226,12 @@ Create a new purchase order from the reorder screen.
 
 ---
 
-## Dave — Forecasting & ML
+## Dave - Forecasting & ML
 
 ### `GET /api/forecasts/:productId?horizon=30`
 
-- `productId` — matches the `productId` values from `/api/inventory`
-- `horizon` — number of days to forecast ahead (default 30)
+- `productId` - matches the `productId` values from `/api/inventory`
+- `horizon` - number of days to forecast ahead (default 30)
 
 ```json
 {
@@ -253,10 +253,10 @@ Create a new purchase order from the reorder screen.
 }
 ```
 
-- `model` — name of the model selected for this product (shown as a label in the UI)
-- `metrics` — error metrics for the selected model. All three are displayed.
-- `history` — ~60 days of actuals for the chart backdrop. More is fine.
-- `forecast[].lower` / `upper` — confidence band bounds. **Required** — the chart renders a shaded band. If your model only produces point estimates, set `lower = predicted * 0.85` and `upper = predicted * 1.15` as a fallback so the UI degrades gracefully.
+- `model` - name of the model selected for this product (shown as a label in the UI)
+- `metrics` - error metrics for the selected model. All three are displayed.
+- `history` - ~60 days of actuals for the chart backdrop. More is fine.
+- `forecast[].lower` / `upper` - confidence band bounds. **Required** - the chart renders a shaded band. If your model only produces point estimates, set `lower = predicted * 0.85` and `upper = predicted * 1.15` as a fallback so the UI degrades gracefully.
 
 ---
 
@@ -281,8 +281,8 @@ One entry per product showing which model was selected and why (all candidates r
 ]
 ```
 
-- `selectedModel` — must match one of the `model` strings in `candidates`
-- `candidates` — include all models you evaluated, even poor performers. The UI renders a comparison table so the selection reasoning is visible.
+- `selectedModel` - must match one of the `model` strings in `candidates`
+- `candidates` - include all models you evaluated, even poor performers. The UI renders a comparison table so the selection reasoning is visible.
 - All metric values are floats rounded to 2 decimal places.
 
 ---

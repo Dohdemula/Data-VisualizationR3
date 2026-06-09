@@ -59,8 +59,8 @@ export default function RequestAccess() {
           Request your own InvenSight deployment for your business.
         </p>
         <ul className="auth-brand-features">
-          <li>Your own private instance — your data stays yours</li>
-          <li>Full setup wizard — no technical knowledge needed</li>
+          <li>Your own private instance - your data stays yours</li>
+          <li>Full setup wizard - no technical knowledge needed</li>
           <li>You'll hear back within 24 hours</li>
           <li>Invite your entire team once you're set up</li>
         </ul>
@@ -166,7 +166,7 @@ export default function RequestAccess() {
               <h3>Request received!</h3>
               <p>
                 We'll review your request and email you at <strong>{form.email}</strong> within 24 hours.
-                If approved, you'll receive a setup token to activate your account — then you can sign in with the credentials you just set.
+                If approved, you'll receive a setup token to activate your account - then you can sign in with the credentials you just set.
               </p>
               <Link to="/login" className="auth-btn-primary" style={{ display: 'block', textAlign: 'center', marginTop: '1.5rem' }}>
                 Back to Sign In

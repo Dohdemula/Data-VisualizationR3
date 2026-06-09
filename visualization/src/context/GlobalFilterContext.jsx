@@ -27,7 +27,7 @@ export function GlobalFilterProvider({ children }) {
   const [warehouse, setWarehouse] = useState('all');
   const [category, setCategory]   = useState('all');
 
-  // Loaded after login — used for search results and deriving filter option lists
+  // Loaded after login - used for search results and deriving filter option lists
   const [allProducts, setAllProducts] = useState([]);
   const [allAlerts,   setAllAlerts]   = useState([]);
 

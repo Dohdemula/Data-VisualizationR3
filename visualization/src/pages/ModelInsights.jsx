@@ -36,8 +36,8 @@ export default function ModelInsights() {
                   onClick={() => setSelected(row)} style={{ cursor: 'pointer' }}>
                   <td>{row.name}</td>
                   <td><span className="model-chip">{row.selectedModel}</span></td>
-                  <td>{row.candidates.find(c => c.model === row.selectedModel)?.mae ?? '—'}</td>
-                  <td>{row.candidates.find(c => c.model === row.selectedModel)?.mape ?? '—'}</td>
+                  <td>{row.candidates.find(c => c.model === row.selectedModel)?.mae ?? '-'}</td>
+                  <td>{row.candidates.find(c => c.model === row.selectedModel)?.mape ?? '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -46,7 +46,7 @@ export default function ModelInsights() {
 
         {selected && (
           <div className="card mi-detail">
-            <div className="chart-card-title">Model Comparison — {selected.name}</div>
+            <div className="chart-card-title">Model Comparison - {selected.name}</div>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={selected.candidates} layout="vertical" margin={{ left: 60, right: 20, top: 4, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

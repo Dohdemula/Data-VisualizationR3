@@ -2,15 +2,15 @@
 
 Intelligent Inventory Forecasting and Sales Analytics System for Kenyan SME retail businesses.
 
-Turns historical sales data into demand forecasts and inventory insights. Complements existing POS systems — it consumes their data for analysis, it does not replace them.
+Turns historical sales data into demand forecasts and inventory insights. Complements existing POS systems - it consumes their data for analysis, it does not replace them.
 
 ---
 
 ## Prerequisites
 
-- **Node.js 22+** — required for the built-in `node:sqlite` module
+- **Node.js 22+** - required for the built-in `node:sqlite` module
 - **npm**
-- A **Resend account** (or any SMTP provider) for email — optional in development, Ethereal is used automatically as a fallback
+- A **Resend account** (or any SMTP provider) for email - optional in development, Ethereal is used automatically as a fallback
 
 Check your Node version:
 ```bash
@@ -94,10 +94,10 @@ JWT_REFRESH_DAYS=7
 # Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ADMIN_SECRET=<generate a long random secret>
 
-# Developer/installer email — approval notifications and token confirmations go here
+# Developer/installer email - approval notifications and token confirmations go here
 DEVELOPER_EMAIL=you@example.com
 
-# Email (leave all blank in dev — Ethereal test account is auto-created)
+# Email (leave all blank in dev - Ethereal test account is auto-created)
 SMTP_HOST=
 SMTP_PORT=587
 SMTP_USER=
@@ -113,7 +113,7 @@ SMTP_USER=resend
 SMTP_PASS=<your resend api key>
 SMTP_FROM="InvenSight <onboarding@resend.dev>"
 ```
-> Without a verified domain, Resend only delivers to the email address of your Resend account. Use that address for all test submissions.
+> Without a verified custom domain, emails sent via `onboarding@resend.dev` will land in spam on most inboxes. For development, mark them as "Not spam" in Gmail. For production, verify your own domain in Resend and update `SMTP_FROM` accordingly.
 
 ### 3. Configure the frontend
 
@@ -135,13 +135,13 @@ VITE_API_BASE_URL=http://localhost:4000
 
 Open two terminals:
 
-**Terminal 1 — server:**
+**Terminal 1 - server:**
 ```bash
 cd server
 node --experimental-sqlite index.js
 ```
 
-**Terminal 2 — frontend:**
+**Terminal 2 - frontend:**
 ```bash
 cd visualization
 npm run dev
@@ -153,7 +153,7 @@ Frontend runs at `http://localhost:3000`, server at `http://localhost:4000`.
 
 ## Mock mode (no server needed)
 
-Remove or leave blank `VITE_API_BASE_URL` in `visualization/.env`. The frontend runs entirely on mock data — all nine dashboard screens work with no server running. Useful for frontend-only development.
+Remove or leave blank `VITE_API_BASE_URL` in `visualization/.env`. The frontend runs entirely on mock data - all nine dashboard screens work with no server running. Useful for frontend-only development.
 
 Demo accounts (accessible from the login page and the setup wizard) always work in mock mode.
 
@@ -161,7 +161,7 @@ Demo accounts (accessible from the login page and the setup wizard) always work 
 
 ## Instance types
 
-InvenSight is **single-tenant** — one deployment per business. Two instance types exist:
+InvenSight is **single-tenant** - one deployment per business. Two instance types exist:
 
 ### Public instance (`IS_PUBLIC_INSTANCE=true`)
 Hosted by the installer/developer. This is the reference deployment that prospective customers visit first. It hosts the onboarding request form. No real business data lives here.
@@ -169,21 +169,21 @@ Hosted by the installer/developer. This is the reference deployment that prospec
 ### Private / business instance (`IS_PUBLIC_INSTANCE=false`)
 One per customer business. Contains that business's data and users. On first boot (no accounts, not initialized), every route redirects to the setup wizard. After initialization, normal operation.
 
-Both instance types must share the same `ADMIN_SECRET`. This is what allows setup tokens generated on the public instance to be verified on the private instance — no shared database needed.
+Both instance types must share the same `ADMIN_SECRET`. This is what allows setup tokens generated on the public instance to be verified on the private instance - no shared database needed.
 
 ---
 
 ## First-time setup walkthrough
 
-### Step 1 — Request access (on the public instance)
+### Step 1 - Request access (on the public instance)
 
 1. Visit the public instance URL
 2. Click **"New here? Get started"** on the login page
 3. On the setup wizard, click **"Don't have a token yet? Request access"**
-4. Fill out the request form — including the **email and password** you want to use as your management account
-5. Submit — you'll receive a confirmation email
+4. Fill out the request form - including the **email and password** you want to use as your management account
+5. Submit - you'll receive a confirmation email
 
-### Step 2 — Developer approves (on the public instance)
+### Step 2 - Developer approves (on the public instance)
 
 1. Developer receives an approval notification at `DEVELOPER_EMAIL`
 2. Click the link → `/approve-request` page
@@ -191,14 +191,14 @@ Both instance types must share the same `ADMIN_SECRET`. This is what allows setu
 4. A setup token is emailed to the requester
 5. In development (`NODE_ENV=development`), the token is also printed to the server console
 
-### Step 3 — Complete setup (on the private business instance)
+### Step 3 - Complete setup (on the private business instance)
 
 1. Visit the private instance URL
 2. The app detects it's uninitialized and redirects to `/setup`
 3. Paste your setup token
 4. Click Continue → fill in business name, timezone, currency
 5. Click **"Set Up My Dashboard"**
-6. You're redirected to the login page — sign in with the email and password you set in Step 1
+6. You're redirected to the login page - sign in with the email and password you set in Step 1
 
 ---
 
@@ -210,7 +210,7 @@ Both instance types must share the same `ADMIN_SECRET`. This is what allows setu
 | **Analytical** | Everything above + sales analytics, forecasts, model insights, reports. For analysts and planners. |
 | **Management** | Everything above + settings, user management, admin. For business owners. |
 
-Roles are hierarchical — higher tiers see everything lower tiers see, plus more. Tabs a role can't access are hidden, not greyed out.
+Roles are hierarchical - higher tiers see everything lower tiers see, plus more. Tabs a role can't access are hidden, not greyed out.
 
 ---
 
@@ -218,7 +218,7 @@ Roles are hierarchical — higher tiers see everything lower tiers see, plus mor
 
 Additional users are invited by a Management account from the **Settings** screen. They receive an email with a link to set their own password. Management never sees or sets passwords for invited users.
 
-> The invite flow UI is currently under development.
+Invite links expire after 72 hours. If a link expires before the user accepts, re-invite from Settings — a new link will be issued.
 
 ---
 

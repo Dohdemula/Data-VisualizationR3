@@ -8,7 +8,7 @@ Thumbs.db
 *.suo
 *.user
 
-# Environment — never commit; see .env.example in each subfolder
+# Environment - never commit; see .env.example in each subfolder
 .env
 .env.local
 .env.*.local
@@ -18,5 +18,5 @@ Thumbs.db
 *.log
 sow_text.txt
 
-# Claude Code — project diary, not for the repo
+# Claude Code - project diary, not for the repo
 CLAUDE.md

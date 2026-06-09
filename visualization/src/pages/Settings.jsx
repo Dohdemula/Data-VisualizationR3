@@ -259,9 +259,9 @@ export default function Settings() {
             value={prefs.currency}
             onChange={e => handlePrefChange('currency', e.target.value)}
           >
-            <option value="KES">KES — Kenyan Shilling</option>
-            <option value="USD">USD — US Dollar</option>
-            <option value="EUR">EUR — Euro</option>
+            <option value="KES">KES - Kenyan Shilling</option>
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
           </select>
         </div>
       </div>

@@ -141,7 +141,7 @@ router.post('/logout', (req, res) => {
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', async (req, res) => {
-  // Always 200 — never reveal whether an email exists
+  // Always 200 - never reveal whether an email exists
   res.json({ ok: true, message: 'If an account with that email exists, a reset link has been sent.' });
 
   const { email } = req.body;
@@ -155,7 +155,7 @@ router.post('/forgot-password', async (req, res) => {
   const expiresAt = Math.floor(Date.now() / 1000) + 3600;
 
   db.prepare(`UPDATE users SET reset_token = ?, reset_expires_at = ? WHERE id = ?`)
-    .run(token, expiresAt, user.id);
+    .run(hashToken(token), expiresAt, user.id);
 
   try {
     await sendPasswordReset({ to: user.email, name: user.name, token });
@@ -177,7 +177,7 @@ router.post('/reset-password', async (req, res) => {
   const db   = getDb();
   const user = db.prepare(
     `SELECT * FROM users WHERE reset_token = ? AND reset_expires_at > unixepoch()`
-  ).get(token);
+  ).get(hashToken(token));
 
   if (!user) {
     return res.status(400).json({ error: 'Reset link is invalid or has expired.' });

@@ -121,7 +121,7 @@ export default function Overview() {
       <div className="overview-charts">
         {/* Sales sparkline */}
         <div className="card chart-card">
-          <div className="chart-card-title">Sales Trend — {DATE_RANGE_OPTIONS.find(o=>o.value===dateRange)?.label}</div>
+          <div className="chart-card-title">Sales Trend - {DATE_RANGE_OPTIONS.find(o=>o.value===dateRange)?.label}</div>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={visibleTrend} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d) => d.slice(5)} interval="preserveStartEnd" />

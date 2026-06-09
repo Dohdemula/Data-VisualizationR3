@@ -42,7 +42,7 @@ function AdjustModal({ product, onClose, onSave }) {
   return (
     <div className="modal-overlay">
       <div className="modal card">
-        <div className="modal-title">Adjust Stock — {product.name}</div>
+        <div className="modal-title">Adjust Stock - {product.name}</div>
         <label className="modal-label">New quantity</label>
         <input className="modal-input" type="number" min={0} value={qty} onChange={e => setQty(+e.target.value)} />
         <label className="modal-label">Reason</label>

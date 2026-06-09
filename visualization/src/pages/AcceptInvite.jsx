@@ -107,7 +107,7 @@ export default function AcceptInvite() {
 
                 {invite.role !== 'operational' && (
                   <div className="auth-field">
-                    <label htmlFor="username">Username <span className="auth-optional">(optional — email works too)</span></label>
+                    <label htmlFor="username">Username <span className="auth-optional">(optional - email works too)</span></label>
                     <input
                       id="username" type="text" placeholder="Short login alias"
                       value={username} onChange={e => setUsername(e.target.value)}

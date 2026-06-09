@@ -132,11 +132,11 @@ async function sendApprovalNotification({ to, businessName, name, email, phone, 
   const info = await t.sendMail({
     from: FROM,
     to,
-    subject: `New InvenSight request — ${businessName}`,
+    subject: `New InvenSight request - ${businessName}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#0f172a">
         <div style="background:#1e293b;padding:24px 32px;border-radius:8px 8px 0 0">
-          <h2 style="color:#fff;margin:0;font-size:1.2rem">InvenSight — New Access Request</h2>
+          <h2 style="color:#fff;margin:0;font-size:1.2rem">InvenSight - New Access Request</h2>
         </div>
         <div style="padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px">
           <table style="width:100%;border-collapse:collapse;font-size:0.875rem;margin-bottom:24px">
@@ -199,7 +199,7 @@ async function sendTokenIssuedConfirmation({ to, name, email, businessName }) {
   await t.sendMail({
     from: FROM,
     to,
-    subject: `Setup token issued — ${businessName}`,
+    subject: `Setup token issued - ${businessName}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#0f172a">
         <div style="background:#1e293b;padding:24px 32px;border-radius:8px 8px 0 0">
@@ -207,7 +207,7 @@ async function sendTokenIssuedConfirmation({ to, name, email, businessName }) {
         </div>
         <div style="padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px">
           <p>A setup token was issued to <strong>${name}</strong> (<a href="mailto:${email}">${email}</a>) for <strong>${businessName}</strong>.</p>
-          <p>The token has been sent to their email. You do not receive a copy — this is intentional.</p>
+          <p>The token has been sent to their email. You do not receive a copy - this is intentional.</p>
           <p style="font-size:0.8rem;color:#64748b">Token expires in 7 days. No further action needed from you.</p>
         </div>
       </div>`,

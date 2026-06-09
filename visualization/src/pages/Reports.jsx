@@ -55,7 +55,7 @@ export default function Reports() {
   };
 
   const exportSalesSummary = () => {
-    // Builds from allProducts revenue proxy — real data will come from Brian's endpoint
+    // Builds from allProducts revenue proxy - real data will come from Brian's endpoint
     const rows = [
       ['Product', 'Category', 'Warehouse', 'Est. Revenue', 'Est. Units'],
       ...filteredProducts.map(p => [

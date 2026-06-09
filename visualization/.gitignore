@@ -12,7 +12,7 @@ build/
 # Testing
 coverage/
 
-# Environment — never commit real .env files; use .env.example for documentation
+# Environment - never commit real .env files; use .env.example for documentation
 .env
 .env.local
 .env.development.local

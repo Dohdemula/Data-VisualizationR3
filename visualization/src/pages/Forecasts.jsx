@@ -87,7 +87,7 @@ export default function Forecasts() {
          error   ? <ErrorState message={error} onRetry={() => setSelectedId(s => s)} /> :
          !data   ? <EmptyState title="Select a product" /> :
         <>
-          <div className="chart-card-title">Demand Forecast — <span className="fc-range-label">Likely range shaded</span></div>
+          <div className="chart-card-title">Demand Forecast - <span className="fc-range-label">Likely range shaded</span></div>
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

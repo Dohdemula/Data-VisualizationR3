@@ -92,9 +92,9 @@ function AppRoutes() {
         element={isAuthenticated ? <Navigate to="/" replace /> : <ForgotPassword />}
       />
 
-      {/* Onboarding routes — always public */}
+      {/* Onboarding routes - always public */}
       <Route path="/request-access"
-        element={sys.isPublicInstance ? <RequestAccess /> : <Navigate to="/login" replace />}
+        element={(sys.isPublicInstance || !sys.initialized) ? <RequestAccess /> : <Navigate to="/login" replace />}
       />
       <Route path="/setup"
         element={(!sys.isPublicInstance && sys.initialized)
@@ -105,7 +105,7 @@ function AppRoutes() {
       <Route path="/accept-invite"   element={<AcceptInvite />} />
       <Route path="/reset-password"  element={<ResetPassword />} />
 
-      {/* Dashboard — requires auth */}
+      {/* Dashboard - requires auth */}
       <Route path="/*"
         element={isAuthenticated ? <DashboardRoutes /> : <Navigate to="/login" replace />}
       />

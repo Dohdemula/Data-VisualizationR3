@@ -5,7 +5,7 @@ import { useRole } from '../context/RoleContext';
 import './Login.css';
 
 const DEMO_ROLES = [
-  { role: 'management',  label: 'Management',  color: '#6d28d9', desc: 'Full access — KPIs, forecasts, admin' },
+  { role: 'management',  label: 'Management',  color: '#6d28d9', desc: 'Full access - KPIs, forecasts, admin' },
   { role: 'analytical',  label: 'Analytical',  color: '#1d4ed8', desc: 'Sales analytics, forecasts, reports' },
   { role: 'operational', label: 'Operational', color: '#065f46', desc: 'Inventory, alerts, stock tasks' },
 ];
@@ -68,7 +68,6 @@ export default function Login({ isPublicInstance = false, initialized = true }) 
           <li>Sales analytics &amp; trend insights</li>
           <li>Role-based access for your whole team</li>
         </ul>
-
       </div>
 
       <div className="auth-card-wrap">
@@ -123,9 +122,12 @@ export default function Login({ isPublicInstance = false, initialized = true }) 
             <Link to="/forgot-password">Forgot your password?</Link>
           </p>
 
-          {(isPublicInstance || !initialized) && (
+          {(!initialized || isPublicInstance) && (
             <p className="auth-switch" style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--color-border)' }}>
-              New here? <Link to="/setup">Get started</Link>
+              {!initialized
+                ? <><Link to="/setup">Set up your dashboard?</Link> - first-time setup</>
+                : <>Want this for your business? <Link to="/request-access">Request access</Link></>
+              }
             </p>
           )}
 
@@ -133,7 +135,7 @@ export default function Login({ isPublicInstance = false, initialized = true }) 
           <div className="auth-demo">
             <div className="auth-demo-label">Try a live demo</div>
             <p className="auth-demo-hint" style={{ marginBottom: '.75rem', marginTop: 0 }}>
-              Explore the full dashboard with sample data — no account needed.
+              Explore the full dashboard with sample data - no account needed.
             </p>
             <div className="auth-demo-cards">
               {DEMO_ROLES.map(({ role, label, color, desc }) => (

@@ -46,7 +46,7 @@ async function main() {
     process.exit(0);
   }
 
-  console.log('\n=== InvenSight — First-time Setup ===\n');
+  console.log('\n=== InvenSight - First-time Setup ===\n');
 
   const name     = (await ask('Owner full name:    ')).trim();
   const email    = (await ask('Owner email:        ')).trim().toLowerCase();

@@ -9,7 +9,7 @@ function hash(t) {
   return crypto.createHash('sha256').update(t).digest('hex');
 }
 
-// GET /api/setup/status — checked by the frontend on every load
+// GET /api/setup/status - checked by the frontend on every load
 router.get('/status', (req, res) => {
   const db     = getDb();
   const config = db.prepare(`SELECT value FROM system_config WHERE key = 'initialized'`).get();
@@ -19,7 +19,7 @@ router.get('/status', (req, res) => {
   });
 });
 
-// POST /api/setup — run once; creates the first Management user
+// POST /api/setup - run once; creates the first Management user
 router.post('/', async (req, res) => {
   const db     = getDb();
   const config = db.prepare(`SELECT value FROM system_config WHERE key = 'initialized'`).get();
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Invalid setup token.' });
   }
 
-  // Credentials travel inside the token — reject tokens from the old flow
+  // Credentials travel inside the token - reject tokens from the old flow
   if (!payload.passwordHash || !payload.email || !payload.name) {
     return res.status(400).json({
       error: 'This token was issued under an older flow. The requester must submit a new request.',

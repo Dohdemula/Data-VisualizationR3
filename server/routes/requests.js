@@ -12,15 +12,17 @@ const {
 const IS_PUBLIC = process.env.IS_PUBLIC_INSTANCE === 'true';
 
 function onlyPublic(req, res, next) {
-  if (!IS_PUBLIC) return res.status(404).json({ error: 'Not found.' });
-  next();
+  if (IS_PUBLIC) return next();
+  const initialized = getDb().prepare(`SELECT value FROM system_config WHERE key = 'initialized'`).get();
+  if (!initialized) return next();
+  return res.status(404).json({ error: 'Not found.' });
 }
 
 function hash(t) {
   return crypto.createHash('sha256').update(t).digest('hex');
 }
 
-// POST /api/requests — submit an access request
+// POST /api/requests - submit an access request
 router.post('/', onlyPublic, async (req, res) => {
   const { businessName, name, email, phone, message, password } = req.body;
 
@@ -63,7 +65,7 @@ router.post('/', onlyPublic, async (req, res) => {
   res.json({ ok: true });
 });
 
-// GET /api/requests/:id/details — load request details for the approval page
+// GET /api/requests/:id/details - load request details for the approval page
 router.get('/:id/details', onlyPublic, (req, res) => {
   const { key } = req.query;
   if (!key) return res.status(400).json({ error: 'Approval key is required.' });
@@ -80,7 +82,7 @@ router.get('/:id/details', onlyPublic, (req, res) => {
   res.json(safe);
 });
 
-// POST /api/requests/:id/approve — developer confirms; generates + sends setup token
+// POST /api/requests/:id/approve - developer confirms; generates + sends setup token
 router.post('/:id/approve', onlyPublic, async (req, res) => {
   const { key } = req.query;
   if (!key) return res.status(400).json({ error: 'Approval key is required.' });
