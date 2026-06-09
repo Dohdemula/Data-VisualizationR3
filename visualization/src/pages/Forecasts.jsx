@@ -176,7 +176,7 @@ export default function Forecasts() {
           {/* Chart */}
           <div className="fc-chart-title">
             Daily Demand Forecast
-            <span className="fc-range-label"> — shaded band shows likely range</span>
+            <span className="fc-range-label"> -shaded band shows likely range</span>
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <ComposedChart data={chartData} margin={{ top: 8, right: 24, left: -10, bottom: 0 }}>

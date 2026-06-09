@@ -62,7 +62,7 @@ export default function ModelInsights() {
         {selected && (
           <div className="card mi-detail">
             <div className="chart-card-title">
-              Model Comparison — {selected.name}
+              Model Comparison -{selected.name}
               <span className="mi-score-hint"> (score: lower is better)</span>
             </div>
             <ResponsiveContainer width="100%" height={220}>

@@ -13,12 +13,12 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# SQLite database files — never commit live data
+# SQLite database files -never commit live data
 server/data/*.db
 server/data/*.db-shm
 server/data/*.db-wal
 
-# Dataset — large CSV, not source code
+# Dataset -large CSV, not source code
 Data set/
 
 # Server runtime logs
@@ -30,3 +30,6 @@ sow_text.txt
 
 # Claude Code - project diary, not for the repo
 CLAUDE.md
+
+#Scope of work frontend - not for the repo
+Scope_of_Work_Dashboard_Frontend.docx
